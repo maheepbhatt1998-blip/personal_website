@@ -4,6 +4,6 @@
   "outputDirectory": "dist/personal-website/browser",
   "framework": "angular",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!.*\\.).*)", "destination": "/index.html" }
   ]
 }
