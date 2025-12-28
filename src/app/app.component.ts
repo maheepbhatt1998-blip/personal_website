@@ -20,7 +20,7 @@ export class AppComponent {
   instagramUrl = 'https://instagram.com/yourhandle';
 
   // About section
-  aboutMe = `Goal-oriented and highly motivated PhD researcher specializing in power electronics applications. With over two years of relevant power electronics experience in industry and research projects, I have consistently demonstrated the ability to thrive in fast-paced, dynamic environments while delivering significant, meaningful results. Passionate about advancing sustainable, high-performance solutions in the automotive industry.`;
+  aboutMe = `I am a PhD student in Electrical and Computer Engineering at the University of Wisconsin–Madison, affiliated with WEMPEC, where my research focuses on advanced power electronics and motor-drive systems for electric transportation and energy applications. My work centers on current source inverter (CSI) architectures and wide-bandgap devices, particularly GaN- and SiC-based bidirectional switches, with emphasis on high-frequency converter design, gate-drive development, double-pulse testing, and the impact of parasitics, switching behavior, and protection on system performance. I am especially interested in the co-design of power electronics and electric machines, including PMSMs and axial-flux machines, for applications such as electric vehicles, UPS systems, and data centers. My research combines simulation-driven design using tools such as MATLAB/Simulink, PLECS, and ANSYS-based workflows with hands-on hardware development, including multi-layer PCB design and high-power laboratory testing, with the goal of delivering practical, scalable, and industry-relevant power-electronic solutions.`;
 
   // Skills with icons
   skills = [
