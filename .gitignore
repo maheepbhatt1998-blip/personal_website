@@ -1,0 +1,45 @@
+# Dependencies
+/node_modules
+
+# Build outputs
+/dist
+/tmp
+/out-tsc
+/.angular
+
+# IDE
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+.DS_Store
+Thumbs.db
+
+# System Files
+.DS_Store
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local

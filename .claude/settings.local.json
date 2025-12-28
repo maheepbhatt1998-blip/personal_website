@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ng version:*)",
+      "Bash(where npm:*)",
+      "Bash(where:*)",
+      "Bash(cmd /c \"where npm\")",
+      "Bash(cmd /c \"npm --version\")",
+      "Bash(powershell -Command \"Get-Command npm -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source\")",
+      "Bash(powershell:*)",
+      "Bash(node --version)",
+      "Bash(npm --version)",
+      "Bash(npm install)",
+      "Bash(npm start)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(vercel deploy:*)",
+      "Bash(vercel login)",
+      "Bash(git add:*)"
+    ]
+  }
+}
