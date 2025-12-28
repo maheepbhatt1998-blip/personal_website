@@ -7,6 +7,7 @@
       <a (click)="scrollToSection('experience')">Experience</a>
       <a (click)="scrollToSection('education')">Education</a>
       <a (click)="scrollToSection('skills')">Skills</a>
+      <a (click)="scrollToSection('research')">Research</a>
       <a (click)="scrollToSection('publications')">Publications</a>
       <a (click)="scrollToSection('contact')">Contact</a>
     </div>
@@ -195,6 +196,45 @@
             </svg>
           </div>
           <span class="skill-name">{{ skill.name }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Research Projects Section -->
+  <section id="research" class="section research-section">
+    <div class="section-content">
+      <h2 class="section-title">Research Projects</h2>
+      <div class="research-grid">
+        <div class="research-card" *ngFor="let project of researchProjects">
+          <div class="research-icon" [ngSwitch]="project.icon">
+            <!-- Inverter -->
+            <svg *ngSwitchCase="'inverter'" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="10" y="15" width="30" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M16 25H22L24 20L26 30L28 25H34" stroke="currentColor" stroke-width="2"/>
+              <path d="M8 22V28M42 22V28" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <!-- Chip -->
+            <svg *ngSwitchCase="'chip'" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="14" y="14" width="22" height="22" rx="2" stroke="currentColor" stroke-width="2"/>
+              <rect x="18" y="18" width="14" height="14" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10 20H14M10 25H14M10 30H14M36 20H40M36 25H40M36 30H40M20 10V14M25 10V14M30 10V14M20 36V40M25 36V40M30 36V40" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <!-- Circuit -->
+            <svg *ngSwitchCase="'circuit'" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 25H16M34 25H40" stroke="currentColor" stroke-width="2"/>
+              <rect x="16" y="20" width="18" height="10" rx="1" stroke="currentColor" stroke-width="2"/>
+              <path d="M20 20V16M25 20V14M30 20V16M20 30V34M25 30V36M30 30V34" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <!-- Power -->
+            <svg *ngSwitchCase="'power'" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M28 8L18 26H24L22 42L32 24H26L28 8Z" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+          </div>
+          <h3>{{ project.title }}</h3>
+          <ul class="research-highlights">
+            <li *ngFor="let highlight of project.highlights">{{ highlight }}</li>
+          </ul>
         </div>
       </div>
     </div>

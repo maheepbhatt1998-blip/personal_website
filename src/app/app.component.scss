@@ -656,9 +656,122 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
   }
 }
 
+// Research Projects Section
+.research-section {
+  background: $background-dark;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+      radial-gradient(circle at 20% 50%, rgba(74, 158, 187, 0.03) 0%, transparent 40%),
+      radial-gradient(circle at 80% 50%, rgba(92, 184, 143, 0.03) 0%, transparent 40%);
+  }
+
+  .research-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    position: relative;
+  }
+
+  .research-card {
+    background: $background-card;
+    padding: 28px;
+    border-radius: 16px;
+    border: 1px solid $border-color;
+    transition: all 0.3s ease;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: $gradient-electric;
+      border-radius: 16px 16px 0 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    &:hover {
+      transform: translateY(-5px);
+      border-color: $primary-color;
+      @include glow-effect($primary-color);
+
+      &::before {
+        opacity: 1;
+      }
+
+      .research-icon {
+        color: $primary-color;
+        transform: scale(1.1);
+      }
+    }
+
+    .research-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+      color: $text-secondary;
+      transition: all 0.3s ease;
+
+      svg {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: $text-primary;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .research-highlights {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        position: relative;
+        padding-left: 20px;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+        color: $text-secondary;
+        line-height: 1.5;
+
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 8px;
+          width: 6px;
+          height: 6px;
+          background: $primary-color;
+          border-radius: 50%;
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
 // Publications Section
 .publications-section {
-  background: $background-dark;
+  background: $background-card;
   position: relative;
 
   &::before {

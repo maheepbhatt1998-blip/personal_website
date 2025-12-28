@@ -16,7 +16,16 @@
       "Bash(npm run build:*)",
       "Bash(vercel deploy:*)",
       "Bash(vercel login)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(gh auth:*)",
+      "Bash(cmd /c \"gh auth status\")",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(vercel link:*)",
+      "Bash(vercel git connect:*)",
+      "Bash(vercel:*)"
     ]
   }
 }

@@ -92,6 +92,46 @@ export class AppComponent {
     }
   ];
 
+  // Research Projects
+  researchProjects = [
+    {
+      title: 'Comparison of VSI and CSI for Traction Drive Applications',
+      icon: 'inverter',
+      highlights: [
+        'Simulation closed modeling of the three inverters',
+        'Double pulse testing of the switch for both inverters',
+        'Loss modeling of Voltage Source Inverter and Current Source Inverter'
+      ]
+    },
+    {
+      title: 'Performance Evaluation of GaN Bidirectional Switches',
+      icon: 'chip',
+      highlights: [
+        'Understood the working of the Gate driver circuit for GaN Bidirectional Switches from Infineon',
+        'Designed and fabricated the Gate Driver circuit for the BD switches',
+        'Performing tests for the circuit for the BD switches'
+      ]
+    },
+    {
+      title: 'Fault Detection for Current Source Inverters',
+      icon: 'circuit',
+      highlights: [
+        'Objective: Prevent the open circuit faults in current source inverters',
+        'Developed detection algorithms for fault conditions',
+        'Implemented protection mechanisms for CSI systems'
+      ]
+    },
+    {
+      title: 'Front-end DC-DC Converter for Current Source Inverters',
+      icon: 'power',
+      highlights: [
+        'Reducing voltage stress across front-end DC-DC converter switches by half',
+        'Improving overall efficiency of combined front-end DC-DC converter and CSI system',
+        'Optimizing converter topology for EV applications'
+      ]
+    }
+  ];
+
   // Publications
   publications = [
     {
