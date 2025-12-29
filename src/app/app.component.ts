@@ -829,6 +829,82 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
+  get lossBreakdown(): {
+    switching: number;
+    conduction: number;
+    passive: number;
+    total: number;
+    switchingPercent: number;
+    conductionPercent: number;
+    passivePercent: number;
+    passiveLabel: string;
+    passiveDescription: string;
+  } {
+    const freq = this.switchingFrequency;
+
+    // Normalized loss calculations (qualitative trends)
+    // Switching loss increases linearly with frequency
+    const baseSwitchingLoss = this.inverterType === 'VSI' ? 0.5 : 0.6;
+    const switching = baseSwitchingLoss * (freq / 10); // Normalized to 10kHz baseline
+
+    // Conduction loss is relatively constant (depends on RMS current)
+    const conduction = this.inverterType === 'VSI' ? 1.0 : 1.2;
+
+    // Passive component losses differ between VSI and CSI
+    let passive: number;
+    let passiveLabel: string;
+    let passiveDescription: string;
+
+    if (this.inverterType === 'VSI') {
+      // Capacitor ESR losses: ESR typically increases with frequency, ripple current decreases
+      // Net effect: slight increase then plateau
+      passive = 0.3 + 0.2 * Math.log10(freq + 1) / Math.log10(101);
+      passiveLabel = 'Capacitor ESR Loss';
+      passiveDescription = 'DC-link capacitor ESR dissipation. Ripple current decreases with frequency, but ESR increases at high frequency. Net loss relatively stable.';
+    } else {
+      // Inductor losses: Core loss increases with frequency (Steinmetz), copper loss from ripple
+      // Core loss ∝ f^α where α ≈ 1.3-1.8
+      passive = 0.4 + 0.6 * Math.pow(freq / 100, 1.5);
+      passiveLabel = 'Inductor Core + Cu Loss';
+      passiveDescription = 'DC-link inductor losses include core loss (∝ f^1.5) and copper loss from AC ripple. Core loss dominates at high frequency.';
+    }
+
+    const total = switching + conduction + passive;
+
+    return {
+      switching: switching,
+      conduction: conduction,
+      passive: passive,
+      total: total,
+      switchingPercent: (switching / total) * 100,
+      conductionPercent: (conduction / total) * 100,
+      passivePercent: (passive / total) * 100,
+      passiveLabel: passiveLabel,
+      passiveDescription: passiveDescription
+    };
+  }
+
+  get lossExplanation(): string {
+    const freq = this.switchingFrequency;
+    if (this.inverterType === 'VSI') {
+      if (freq <= 10) {
+        return 'At low switching frequency, conduction losses dominate. The DC-link capacitor sees higher ripple current but lower ESR. Switching losses are minimal.';
+      } else if (freq <= 50) {
+        return 'At medium frequency, switching and conduction losses are comparable. Capacitor ripple current decreases, reducing ESR heating. Overall efficiency is near optimal.';
+      } else {
+        return 'At high frequency, switching losses become significant. Capacitor ESR increases at high frequency, but reduced ripple current partially compensates. GaN/SiC devices help minimize switching loss.';
+      }
+    } else {
+      if (freq <= 10) {
+        return 'At low frequency, conduction losses dominate in CSI. The DC-link inductor sees low core loss but higher ripple, increasing copper loss slightly.';
+      } else if (freq <= 50) {
+        return 'At medium frequency, inductor core losses begin to rise (Steinmetz equation). Switching losses increase but CSI inherently has soft-switching benefits in some topologies.';
+      } else {
+        return 'At high frequency, inductor core losses (∝ f^1.5) become significant. Advanced core materials (nanocrystalline, ferrite) are needed. Switching losses are high without soft-switching.';
+      }
+    }
+  }
+
   ngOnInit(): void {
     this.updateWaveform();
     this.startSwitchAnimation();

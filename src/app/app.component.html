@@ -768,6 +768,114 @@ This is a sample document with \textbf{bold} and \textit{italic} text.
           </div>
         </div>
 
+        <!-- Loss Breakdown Panel -->
+        <div class="loss-breakdown-panel">
+          <h4>Loss Breakdown at {{ switchingFrequency }} kHz</h4>
+
+          <div class="loss-chart">
+            <!-- Bar Chart -->
+            <div class="loss-bars">
+              <div class="loss-bar-container">
+                <div class="loss-bar switching" [style.height.%]="lossBreakdown.switchingPercent * 0.8">
+                  <span class="bar-value">{{ lossBreakdown.switchingPercent | number:'1.0-0' }}%</span>
+                </div>
+                <span class="bar-label">Switching</span>
+              </div>
+              <div class="loss-bar-container">
+                <div class="loss-bar conduction" [style.height.%]="lossBreakdown.conductionPercent * 0.8">
+                  <span class="bar-value">{{ lossBreakdown.conductionPercent | number:'1.0-0' }}%</span>
+                </div>
+                <span class="bar-label">Conduction</span>
+              </div>
+              <div class="loss-bar-container">
+                <div class="loss-bar passive" [style.height.%]="lossBreakdown.passivePercent * 0.8">
+                  <span class="bar-value">{{ lossBreakdown.passivePercent | number:'1.0-0' }}%</span>
+                </div>
+                <span class="bar-label">{{ inverterType === 'VSI' ? 'Cap ESR' : 'Inductor' }}</span>
+              </div>
+            </div>
+
+            <!-- Stacked Bar -->
+            <div class="loss-stacked">
+              <div class="stacked-bar">
+                <div class="segment switching" [style.width.%]="lossBreakdown.switchingPercent"></div>
+                <div class="segment conduction" [style.width.%]="lossBreakdown.conductionPercent"></div>
+                <div class="segment passive" [style.width.%]="lossBreakdown.passivePercent"></div>
+              </div>
+              <div class="stacked-labels">
+                <span>0%</span>
+                <span>Total Loss Distribution</span>
+                <span>100%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loss Details -->
+          <div class="loss-details">
+            <div class="loss-item switching-loss">
+              <div class="loss-header">
+                <span class="loss-dot switching"></span>
+                <strong>Switching Loss</strong>
+                <span class="loss-trend">∝ f<sub>sw</sub></span>
+              </div>
+              <p>Energy dissipated during switch turn-on/off transitions. Increases linearly with switching frequency.</p>
+            </div>
+
+            <div class="loss-item conduction-loss">
+              <div class="loss-header">
+                <span class="loss-dot conduction"></span>
+                <strong>Conduction Loss</strong>
+                <span class="loss-trend">≈ constant</span>
+              </div>
+              <p>I²R losses in switches when conducting. Depends on RMS current, relatively independent of frequency.</p>
+            </div>
+
+            <div class="loss-item passive-loss">
+              <div class="loss-header">
+                <span class="loss-dot passive"></span>
+                <strong>{{ lossBreakdown.passiveLabel }}</strong>
+                <span class="loss-trend">{{ inverterType === 'VSI' ? '≈ stable' : '∝ f^1.5' }}</span>
+              </div>
+              <p>{{ lossBreakdown.passiveDescription }}</p>
+            </div>
+          </div>
+
+          <!-- Dynamic Explanation -->
+          <div class="loss-explanation">
+            <div class="explanation-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+            </div>
+            <p>{{ lossExplanation }}</p>
+          </div>
+
+          <!-- Energy Storage Comparison -->
+          <div class="energy-storage-info">
+            <h5>Energy Storage in {{ inverterType }}</h5>
+            <div class="storage-formula" *ngIf="inverterType === 'VSI'">
+              <div class="formula">E = ½CV²</div>
+              <p>The DC-link <strong>capacitor</strong> stores energy in its <em>electric field</em>. It maintains constant voltage across the inverter input, absorbing/supplying instantaneous power differences.</p>
+              <ul>
+                <li>Capacitor ESR causes I²R heating from ripple current</li>
+                <li>ESR typically increases at high frequency (dielectric losses)</li>
+                <li>Ripple current decreases with higher f<sub>sw</sub>, partially compensating</li>
+              </ul>
+            </div>
+            <div class="storage-formula" *ngIf="inverterType === 'CSI'">
+              <div class="formula">E = ½LI²</div>
+              <p>The DC-link <strong>inductor</strong> stores energy in its <em>magnetic field</em>. It maintains constant current into the inverter, acting as a current buffer.</p>
+              <ul>
+                <li>Core loss follows Steinmetz equation: P<sub>core</sub> ∝ f<sup>α</sup>B<sup>β</sup></li>
+                <li>Copper loss from AC ripple current (skin/proximity effects)</li>
+                <li>Core loss dominates at high frequency, requiring advanced materials</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
         <!-- Explanation Panel -->
         <div class="inverter-explanation">
           <div class="explanation-header">

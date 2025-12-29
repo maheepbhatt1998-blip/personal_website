@@ -2250,6 +2250,247 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
     }
   }
 
+  .loss-breakdown-panel {
+    background: $background-dark;
+    border-radius: 12px;
+    border: 1px solid $border-color;
+    padding: 24px;
+
+    h4 {
+      text-align: center;
+      color: $text-primary;
+      margin-bottom: 24px;
+      font-size: 1.1rem;
+    }
+
+    .loss-chart {
+      margin-bottom: 24px;
+
+      .loss-bars {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        gap: 32px;
+        height: 150px;
+        margin-bottom: 24px;
+        padding: 0 20px;
+
+        .loss-bar-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 80px;
+
+          .loss-bar {
+            width: 60px;
+            min-height: 20px;
+            border-radius: 4px 4px 0 0;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 8px;
+            transition: height 0.3s ease;
+
+            &.switching {
+              background: linear-gradient(180deg, #ff6b6b 0%, #cc5555 100%);
+            }
+
+            &.conduction {
+              background: linear-gradient(180deg, #00d4ff 0%, #00a8cc 100%);
+            }
+
+            &.passive {
+              background: linear-gradient(180deg, #ffaa00 0%, #cc8800 100%);
+            }
+
+            .bar-value {
+              font-size: 0.75rem;
+              font-weight: 600;
+              color: white;
+              text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            }
+          }
+
+          .bar-label {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: $text-secondary;
+            text-align: center;
+          }
+        }
+      }
+
+      .loss-stacked {
+        .stacked-bar {
+          display: flex;
+          height: 24px;
+          border-radius: 12px;
+          overflow: hidden;
+          background: $border-color;
+
+          .segment {
+            transition: width 0.3s ease;
+
+            &.switching {
+              background: #ff6b6b;
+            }
+
+            &.conduction {
+              background: #00d4ff;
+            }
+
+            &.passive {
+              background: #ffaa00;
+            }
+          }
+        }
+
+        .stacked-labels {
+          display: flex;
+          justify-content: space-between;
+          margin-top: 8px;
+          font-size: 0.75rem;
+          color: $text-secondary;
+
+          span:nth-child(2) {
+            font-weight: 500;
+          }
+        }
+      }
+    }
+
+    .loss-details {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+
+      .loss-item {
+        padding: 16px;
+        border-radius: 8px;
+        background: rgba($border-color, 0.3);
+
+        .loss-header {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 8px;
+
+          .loss-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+
+            &.switching { background: #ff6b6b; }
+            &.conduction { background: #00d4ff; }
+            &.passive { background: #ffaa00; }
+          }
+
+          strong {
+            color: $text-primary;
+            font-size: 0.95rem;
+          }
+
+          .loss-trend {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: $text-secondary;
+            font-family: 'Consolas', monospace;
+            background: rgba($primary-color, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+          }
+        }
+
+        p {
+          color: $text-secondary;
+          font-size: 0.85rem;
+          line-height: 1.5;
+          margin: 0;
+        }
+      }
+    }
+
+    .loss-explanation {
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+      background: rgba($primary-color, 0.1);
+      border-radius: 8px;
+      border-left: 3px solid $primary-color;
+      margin-bottom: 24px;
+
+      .explanation-icon {
+        flex-shrink: 0;
+        color: $primary-color;
+      }
+
+      p {
+        color: $text-secondary;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin: 0;
+      }
+    }
+
+    .energy-storage-info {
+      padding: 20px;
+      background: rgba($secondary-color, 0.05);
+      border-radius: 8px;
+      border: 1px solid rgba($secondary-color, 0.2);
+
+      h5 {
+        color: $secondary-color;
+        font-size: 1rem;
+        margin-bottom: 16px;
+      }
+
+      .storage-formula {
+        .formula {
+          font-family: 'Consolas', 'Monaco', monospace;
+          font-size: 1.5rem;
+          color: $secondary-color;
+          text-align: center;
+          padding: 16px;
+          background: rgba($secondary-color, 0.1);
+          border-radius: 8px;
+          margin-bottom: 16px;
+        }
+
+        p {
+          color: $text-secondary;
+          font-size: 0.9rem;
+          line-height: 1.6;
+          margin-bottom: 12px;
+
+          strong {
+            color: $text-primary;
+          }
+
+          em {
+            color: $secondary-color;
+            font-style: normal;
+          }
+        }
+
+        ul {
+          margin: 0;
+          padding-left: 20px;
+
+          li {
+            color: $text-secondary;
+            font-size: 0.85rem;
+            line-height: 1.8;
+
+            sub, sup {
+              font-size: 0.7em;
+            }
+          }
+        }
+      }
+    }
+  }
+
   .inverter-explanation {
     background: $background-dark;
     border-radius: 12px;
@@ -2680,6 +2921,70 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
       .waveform-legend {
         gap: 12px;
         font-size: 0.8rem;
+      }
+    }
+
+    .loss-breakdown-panel {
+      padding: 16px;
+
+      h4 {
+        font-size: 1rem;
+      }
+
+      .loss-chart {
+        .loss-bars {
+          gap: 16px;
+          height: 120px;
+
+          .loss-bar-container {
+            width: 60px;
+
+            .loss-bar {
+              width: 45px;
+            }
+
+            .bar-label {
+              font-size: 0.7rem;
+            }
+          }
+        }
+      }
+
+      .loss-details .loss-item {
+        padding: 12px;
+
+        .loss-header {
+          flex-wrap: wrap;
+
+          .loss-trend {
+            margin-left: 0;
+            margin-top: 8px;
+            width: 100%;
+            text-align: center;
+          }
+        }
+
+        p {
+          font-size: 0.8rem;
+        }
+      }
+
+      .loss-explanation {
+        flex-direction: column;
+        gap: 12px;
+
+        p {
+          font-size: 0.85rem;
+        }
+      }
+
+      .energy-storage-info {
+        padding: 16px;
+
+        .storage-formula .formula {
+          font-size: 1.25rem;
+          padding: 12px;
+        }
       }
     }
 
