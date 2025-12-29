@@ -1011,9 +1011,18 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
     }
   }
 
+  .column-selectors {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
   .column-selector {
-    max-width: 400px;
-    margin: 0 auto 32px;
+    flex: 1;
+    max-width: 300px;
+    min-width: 200px;
     text-align: center;
 
     label {
@@ -1021,6 +1030,7 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
       color: $text-primary;
       margin-bottom: 12px;
       font-weight: 500;
+      font-size: 0.9rem;
     }
 
     select {
@@ -1043,6 +1053,132 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
         background: $background-dark;
         color: $text-primary;
       }
+    }
+  }
+
+  .digikey-cart-section {
+    max-width: 600px;
+    margin: 0 auto 40px;
+    padding: 32px;
+    background: $background-dark;
+    border-radius: 16px;
+    border: 1px solid $border-color;
+    text-align: center;
+
+    .cart-header {
+      margin-bottom: 24px;
+
+      h3 {
+        color: $text-primary;
+        font-size: 1.25rem;
+        margin-bottom: 8px;
+      }
+
+      p {
+        color: $text-secondary;
+        font-size: 0.9rem;
+      }
+    }
+
+    .cart-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+
+      .btn-digikey {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 32px;
+        background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 20px rgba(204, 0, 0, 0.4);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        svg {
+          flex-shrink: 0;
+        }
+
+        .spinner {
+          width: 20px;
+          height: 20px;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-top-color: white;
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+        }
+      }
+
+      .cart-note {
+        color: $text-secondary;
+        font-size: 0.85rem;
+        font-style: italic;
+      }
+    }
+
+    .cart-success {
+      margin-top: 24px;
+      padding: 24px;
+      background: rgba($secondary-color, 0.1);
+      border: 1px solid rgba($secondary-color, 0.3);
+      border-radius: 12px;
+
+      .success-icon {
+        color: $secondary-color;
+        margin-bottom: 12px;
+      }
+
+      h4 {
+        color: $secondary-color;
+        font-size: 1.125rem;
+        margin-bottom: 8px;
+      }
+
+      p {
+        color: $text-secondary;
+        font-size: 0.9rem;
+        margin-bottom: 16px;
+      }
+
+      .btn-digikey-open {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: $secondary-color;
+        color: $background-dark;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 20px rgba($secondary-color, 0.4);
+        }
+      }
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
     }
   }
 
@@ -1079,7 +1215,7 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
 
       .table-header {
         display: grid;
-        grid-template-columns: 50px 1fr 180px;
+        grid-template-columns: 50px 1fr 70px 160px;
         padding: 16px 20px;
         background: rgba($primary-color, 0.1);
         border-bottom: 1px solid $border-color;
@@ -1095,10 +1231,11 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
 
       .table-row {
         display: grid;
-        grid-template-columns: 50px 1fr 180px;
+        grid-template-columns: 50px 1fr 70px 160px;
         padding: 14px 20px;
         border-bottom: 1px solid $border-color;
         transition: background 0.3s ease;
+        align-items: center;
 
         &:last-child {
           border-bottom: none;
@@ -1117,6 +1254,13 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
           color: $text-primary;
           font-family: 'Consolas', 'Monaco', monospace;
           font-size: 0.9rem;
+        }
+
+        .col-qty {
+          color: $secondary-color;
+          font-weight: 600;
+          font-size: 0.9rem;
+          text-align: center;
         }
 
         .col-link a {
@@ -1915,12 +2059,45 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
       padding: 32px 20px;
     }
 
+    .column-selectors {
+      flex-direction: column;
+      align-items: center;
+
+      .column-selector {
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+
+    .digikey-cart-section {
+      padding: 24px 16px;
+      margin: 0 auto 24px;
+
+      .cart-header h3 {
+        font-size: 1.1rem;
+      }
+
+      .cart-actions .btn-digikey {
+        padding: 12px 24px;
+        font-size: 0.9rem;
+      }
+
+      .cart-success {
+        padding: 16px;
+
+        .btn-digikey-open {
+          padding: 10px 20px;
+          font-size: 0.9rem;
+        }
+      }
+    }
+
     .bom-results {
       .results-table {
         .table-header,
         .table-row {
-          grid-template-columns: 40px 1fr 120px;
-          padding: 12px 16px;
+          grid-template-columns: 35px 1fr 50px 100px;
+          padding: 12px 12px;
           font-size: 0.8rem;
         }
 
@@ -1929,7 +2106,7 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
         }
 
         .col-link a {
-          font-size: 0.75rem;
+          font-size: 0.7rem;
         }
       }
     }

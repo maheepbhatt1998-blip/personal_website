@@ -9,6 +9,7 @@ import { saveAs } from 'file-saver';
 interface BomResult {
   partNumber: string;
   digikeyUrl: string;
+  quantity: number;
 }
 
 @Component({
@@ -233,10 +234,13 @@ export class AppComponent {
   isDragOver = false;
   bomColumns: string[] = [];
   selectedColumn = '';
+  selectedQuantityColumn = '';
   bomData: any[] = [];
   bomResults: BomResult[] = [];
   bomMessage = '';
   bomMessageType: 'error' | 'success' | '' = '';
+  isCreatingCart = false;
+  digiKeyCartUrl = '';
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
@@ -274,6 +278,8 @@ export class AppComponent {
     this.bomResults = [];
     this.bomColumns = [];
     this.selectedColumn = '';
+    this.selectedQuantityColumn = '';
+    this.digiKeyCartUrl = '';
 
     const validExtensions = ['.xlsx', '.xls', '.csv'];
     const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
@@ -312,8 +318,19 @@ export class AppComponent {
           partNumberPatterns.some(pattern => col.toLowerCase().includes(pattern))
         );
 
+        // Auto-detect quantity column
+        const quantityPatterns = ['quantity', 'qty', 'count', 'amount'];
+        const autoDetectedQtyCol = this.bomColumns.find(col =>
+          quantityPatterns.some(pattern => col.toLowerCase().includes(pattern))
+        );
+
         if (autoDetectedCol) {
           this.selectedColumn = autoDetectedCol;
+        }
+        if (autoDetectedQtyCol) {
+          this.selectedQuantityColumn = autoDetectedQtyCol;
+        }
+        if (autoDetectedCol) {
           this.processSelectedColumn();
         }
 
@@ -334,25 +351,41 @@ export class AppComponent {
       return;
     }
 
+    this.digiKeyCartUrl = ''; // Reset cart URL when columns change
+
     const colIndex = this.bomColumns.indexOf(this.selectedColumn);
     if (colIndex === -1) return;
 
-    const partNumbers = this.bomData
-      .map(row => row[colIndex])
-      .filter(val => val && val.toString().trim() !== '')
-      .map(val => val.toString().trim());
+    const qtyColIndex = this.selectedQuantityColumn
+      ? this.bomColumns.indexOf(this.selectedQuantityColumn)
+      : -1;
 
-    // Remove duplicates
-    const uniquePartNumbers = [...new Set(partNumbers)];
+    // Build a map of part numbers to quantities
+    const partQuantityMap = new Map<string, number>();
 
-    this.bomResults = uniquePartNumbers.map(pn => ({
+    this.bomData.forEach(row => {
+      const partNumber = row[colIndex];
+      if (partNumber && partNumber.toString().trim() !== '') {
+        const pn = partNumber.toString().trim();
+        let qty = 1;
+        if (qtyColIndex !== -1 && row[qtyColIndex]) {
+          const parsedQty = parseInt(row[qtyColIndex].toString(), 10);
+          qty = isNaN(parsedQty) ? 1 : parsedQty;
+        }
+        // Aggregate quantities for duplicate part numbers
+        partQuantityMap.set(pn, (partQuantityMap.get(pn) || 0) + qty);
+      }
+    });
+
+    this.bomResults = Array.from(partQuantityMap.entries()).map(([pn, qty]) => ({
       partNumber: pn,
-      digikeyUrl: `https://www.digikey.com/en/products/result?keywords=${encodeURIComponent(pn)}`
+      digikeyUrl: `https://www.digikey.com/en/products/result?keywords=${encodeURIComponent(pn)}`,
+      quantity: qty
     }));
   }
 
   copyAllLinks(): void {
-    const links = this.bomResults.map(r => `${r.partNumber}\t${r.digikeyUrl}`).join('\n');
+    const links = this.bomResults.map(r => `${r.partNumber}\t${r.quantity}\t${r.digikeyUrl}`).join('\n');
     navigator.clipboard.writeText(links).then(() => {
       this.bomMessage = 'All links copied to clipboard!';
       this.bomMessageType = 'success';
@@ -361,6 +394,55 @@ export class AppComponent {
         this.bomMessageType = '';
       }, 3000);
     });
+  }
+
+  async createDigiKeyCart(): Promise<void> {
+    if (this.bomResults.length === 0 || !this.selectedQuantityColumn) {
+      return;
+    }
+
+    this.isCreatingCart = true;
+    this.digiKeyCartUrl = '';
+    this.bomMessage = '';
+    this.bomMessageType = '';
+
+    try {
+      // Prepare the request payload for DigiKey API
+      const parts = this.bomResults.map(item => ({
+        requestedPartNumber: item.partNumber,
+        quantities: [{ quantity: item.quantity }]
+      }));
+
+      // Call our serverless function proxy
+      const response = await fetch('/api/digikey-cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(parts)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.singleUseUrl) {
+        this.digiKeyCartUrl = data.singleUseUrl;
+        this.bomMessage = 'DigiKey cart created successfully!';
+        this.bomMessageType = 'success';
+      } else {
+        throw new Error('No cart URL returned from DigiKey');
+      }
+    } catch (error) {
+      console.error('Error creating DigiKey cart:', error);
+      this.bomMessage = `Failed to create DigiKey cart: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      this.bomMessageType = 'error';
+    } finally {
+      this.isCreatingCart = false;
+    }
   }
 
   // LaTeX Tool properties
