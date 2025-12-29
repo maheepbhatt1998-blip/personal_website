@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
+import * as mammoth from 'mammoth';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
+import { saveAs } from 'file-saver';
 
 interface BomResult {
   partNumber: string;
@@ -358,5 +361,326 @@ export class AppComponent {
         this.bomMessageType = '';
       }, 3000);
     });
+  }
+
+  // LaTeX Tool properties
+  latexActiveTab: 'word-to-latex' | 'latex-to-word' = 'word-to-latex';
+  isLatexDragOver = false;
+  latexOutput = '';
+  latexInput = '';
+  latexMessage = '';
+  latexMessageType: 'error' | 'success' | '' = '';
+  currentFileName = 'document';
+
+  onLatexDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isLatexDragOver = true;
+  }
+
+  onLatexDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isLatexDragOver = false;
+  }
+
+  onLatexDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isLatexDragOver = false;
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      this.processWordFile(files[0]);
+    }
+  }
+
+  onWordFileSelect(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.processWordFile(input.files[0]);
+    }
+  }
+
+  async processWordFile(file: File): Promise<void> {
+    this.latexMessage = '';
+    this.latexMessageType = '';
+    this.latexOutput = '';
+
+    if (!file.name.endsWith('.docx')) {
+      this.latexMessage = 'Please upload a .docx file';
+      this.latexMessageType = 'error';
+      return;
+    }
+
+    this.currentFileName = file.name.replace('.docx', '');
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await mammoth.convertToHtml({ arrayBuffer });
+      const html = result.value;
+
+      // Convert HTML to LaTeX
+      this.latexOutput = this.htmlToLatex(html);
+      this.latexMessage = 'Conversion successful!';
+      this.latexMessageType = 'success';
+    } catch (error) {
+      this.latexMessage = 'Error processing Word file. Please try again.';
+      this.latexMessageType = 'error';
+    }
+  }
+
+  htmlToLatex(html: string): string {
+    let latex = html;
+
+    // Document structure
+    let preamble = `\\documentclass{article}
+\\usepackage[utf8]{inputenc}
+\\usepackage{amsmath}
+\\usepackage{graphicx}
+\\usepackage{hyperref}
+
+\\begin{document}
+
+`;
+
+    // Convert headings
+    latex = latex.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '\\section{$1}\n');
+    latex = latex.replace(/<h2[^>]*>(.*?)<\/h2>/gi, '\\subsection{$1}\n');
+    latex = latex.replace(/<h3[^>]*>(.*?)<\/h3>/gi, '\\subsubsection{$1}\n');
+    latex = latex.replace(/<h4[^>]*>(.*?)<\/h4>/gi, '\\paragraph{$1}\n');
+    latex = latex.replace(/<h5[^>]*>(.*?)<\/h5>/gi, '\\subparagraph{$1}\n');
+    latex = latex.replace(/<h6[^>]*>(.*?)<\/h6>/gi, '\\subparagraph{$1}\n');
+
+    // Convert text formatting
+    latex = latex.replace(/<strong>(.*?)<\/strong>/gi, '\\textbf{$1}');
+    latex = latex.replace(/<b>(.*?)<\/b>/gi, '\\textbf{$1}');
+    latex = latex.replace(/<em>(.*?)<\/em>/gi, '\\textit{$1}');
+    latex = latex.replace(/<i>(.*?)<\/i>/gi, '\\textit{$1}');
+    latex = latex.replace(/<u>(.*?)<\/u>/gi, '\\underline{$1}');
+    latex = latex.replace(/<sup>(.*?)<\/sup>/gi, '\\textsuperscript{$1}');
+    latex = latex.replace(/<sub>(.*?)<\/sub>/gi, '\\textsubscript{$1}');
+
+    // Convert lists
+    latex = latex.replace(/<ul[^>]*>/gi, '\\begin{itemize}\n');
+    latex = latex.replace(/<\/ul>/gi, '\\end{itemize}\n');
+    latex = latex.replace(/<ol[^>]*>/gi, '\\begin{enumerate}\n');
+    latex = latex.replace(/<\/ol>/gi, '\\end{enumerate}\n');
+    latex = latex.replace(/<li[^>]*>(.*?)<\/li>/gi, '  \\item $1\n');
+
+    // Convert paragraphs
+    latex = latex.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n\n');
+
+    // Convert line breaks
+    latex = latex.replace(/<br\s*\/?>/gi, '\\\\\n');
+
+    // Convert links
+    latex = latex.replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '\\href{$1}{$2}');
+
+    // Remove remaining HTML tags
+    latex = latex.replace(/<[^>]+>/g, '');
+
+    // Escape special LaTeX characters (be careful not to double-escape)
+    latex = latex.replace(/&amp;/g, '\\&');
+    latex = latex.replace(/&lt;/g, '<');
+    latex = latex.replace(/&gt;/g, '>');
+    latex = latex.replace(/&nbsp;/g, ' ');
+    latex = latex.replace(/%/g, '\\%');
+    latex = latex.replace(/#/g, '\\#');
+    latex = latex.replace(/\$/g, '\\$');
+
+    // Clean up extra whitespace
+    latex = latex.replace(/\n{3,}/g, '\n\n');
+    latex = latex.trim();
+
+    return preamble + latex + '\n\n\\end{document}';
+  }
+
+  copyLatexOutput(): void {
+    navigator.clipboard.writeText(this.latexOutput).then(() => {
+      this.latexMessage = 'LaTeX code copied to clipboard!';
+      this.latexMessageType = 'success';
+      setTimeout(() => {
+        this.latexMessage = '';
+        this.latexMessageType = '';
+      }, 3000);
+    });
+  }
+
+  downloadLatexFile(): void {
+    const blob = new Blob([this.latexOutput], { type: 'text/plain;charset=utf-8' });
+    saveAs(blob, `${this.currentFileName}.tex`);
+    this.latexMessage = 'LaTeX file downloaded!';
+    this.latexMessageType = 'success';
+  }
+
+  async convertLatexToWord(): Promise<void> {
+    if (!this.latexInput.trim()) {
+      this.latexMessage = 'Please enter some LaTeX code';
+      this.latexMessageType = 'error';
+      return;
+    }
+
+    try {
+      const paragraphs = this.parseLatexToDocx(this.latexInput);
+
+      const doc = new Document({
+        sections: [{
+          properties: {},
+          children: paragraphs
+        }]
+      });
+
+      const blob = await Packer.toBlob(doc);
+      saveAs(blob, 'converted-document.docx');
+
+      this.latexMessage = 'Word document downloaded!';
+      this.latexMessageType = 'success';
+    } catch (error) {
+      this.latexMessage = 'Error converting LaTeX. Please check your syntax.';
+      this.latexMessageType = 'error';
+    }
+  }
+
+  parseLatexToDocx(latex: string): Paragraph[] {
+    const paragraphs: Paragraph[] = [];
+
+    // Remove preamble
+    let content = latex;
+    const beginDoc = content.indexOf('\\begin{document}');
+    const endDoc = content.indexOf('\\end{document}');
+    if (beginDoc !== -1) {
+      content = content.substring(beginDoc + 16);
+    }
+    if (endDoc !== -1) {
+      content = content.substring(0, content.indexOf('\\end{document}'));
+    }
+
+    // Split by sections and paragraphs
+    const lines = content.split('\n');
+    let currentText = '';
+
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+
+      // Handle sections
+      const sectionMatch = trimmedLine.match(/\\section\{([^}]+)\}/);
+      if (sectionMatch) {
+        if (currentText.trim()) {
+          paragraphs.push(new Paragraph({ children: this.parseLatexText(currentText) }));
+          currentText = '';
+        }
+        paragraphs.push(new Paragraph({
+          text: sectionMatch[1],
+          heading: HeadingLevel.HEADING_1
+        }));
+        continue;
+      }
+
+      const subsectionMatch = trimmedLine.match(/\\subsection\{([^}]+)\}/);
+      if (subsectionMatch) {
+        if (currentText.trim()) {
+          paragraphs.push(new Paragraph({ children: this.parseLatexText(currentText) }));
+          currentText = '';
+        }
+        paragraphs.push(new Paragraph({
+          text: subsectionMatch[1],
+          heading: HeadingLevel.HEADING_2
+        }));
+        continue;
+      }
+
+      const subsubsectionMatch = trimmedLine.match(/\\subsubsection\{([^}]+)\}/);
+      if (subsubsectionMatch) {
+        if (currentText.trim()) {
+          paragraphs.push(new Paragraph({ children: this.parseLatexText(currentText) }));
+          currentText = '';
+        }
+        paragraphs.push(new Paragraph({
+          text: subsubsectionMatch[1],
+          heading: HeadingLevel.HEADING_3
+        }));
+        continue;
+      }
+
+      // Handle itemize/enumerate
+      const itemMatch = trimmedLine.match(/\\item\s*(.*)/);
+      if (itemMatch) {
+        if (currentText.trim()) {
+          paragraphs.push(new Paragraph({ children: this.parseLatexText(currentText) }));
+          currentText = '';
+        }
+        paragraphs.push(new Paragraph({
+          children: this.parseLatexText(itemMatch[1]),
+          bullet: { level: 0 }
+        }));
+        continue;
+      }
+
+      // Skip environment markers
+      if (trimmedLine.match(/\\begin\{|\\end\{|\\documentclass|\\usepackage/)) {
+        continue;
+      }
+
+      // Empty line = new paragraph
+      if (trimmedLine === '' && currentText.trim()) {
+        paragraphs.push(new Paragraph({ children: this.parseLatexText(currentText) }));
+        currentText = '';
+        continue;
+      }
+
+      currentText += ' ' + trimmedLine;
+    }
+
+    // Add remaining text
+    if (currentText.trim()) {
+      paragraphs.push(new Paragraph({ children: this.parseLatexText(currentText) }));
+    }
+
+    return paragraphs;
+  }
+
+  parseLatexText(text: string): TextRun[] {
+    const runs: TextRun[] = [];
+    let remaining = text.trim();
+
+    // Simple regex-based parsing for bold, italic, underline
+    const pattern = /\\textbf\{([^}]+)\}|\\textit\{([^}]+)\}|\\underline\{([^}]+)\}|\\emph\{([^}]+)\}|([^\\]+)/g;
+    let match;
+
+    while ((match = pattern.exec(remaining)) !== null) {
+      if (match[1]) {
+        // Bold
+        runs.push(new TextRun({ text: match[1], bold: true }));
+      } else if (match[2]) {
+        // Italic
+        runs.push(new TextRun({ text: match[2], italics: true }));
+      } else if (match[3]) {
+        // Underline
+        runs.push(new TextRun({ text: match[3], underline: {} }));
+      } else if (match[4]) {
+        // Emph (italic)
+        runs.push(new TextRun({ text: match[4], italics: true }));
+      } else if (match[5]) {
+        // Regular text - clean up any remaining LaTeX commands
+        let cleanText = match[5]
+          .replace(/\\[a-zA-Z]+\{[^}]*\}/g, '')
+          .replace(/\\\\/g, '\n')
+          .replace(/\\&/g, '&')
+          .replace(/\\%/g, '%')
+          .replace(/\\#/g, '#')
+          .replace(/\\\$/g, '$')
+          .trim();
+        if (cleanText) {
+          runs.push(new TextRun({ text: cleanText }));
+        }
+      }
+    }
+
+    if (runs.length === 0) {
+      runs.push(new TextRun({ text: text.trim() }));
+    }
+
+    return runs;
   }
 }

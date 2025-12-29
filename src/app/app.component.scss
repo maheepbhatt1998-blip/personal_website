@@ -1161,9 +1161,280 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
   }
 }
 
+// LaTeX Tool Section
+.latex-tool-section {
+  background: $background-dark;
+  position: relative;
+
+  .latex-description {
+    text-align: center;
+    color: $text-secondary;
+    max-width: 600px;
+    margin: 0 auto 32px;
+    font-size: 1.1rem;
+  }
+
+  .latex-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 32px;
+
+    button {
+      padding: 12px 24px;
+      background: $background-card;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      color: $text-secondary;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: $primary-color;
+        color: $text-primary;
+      }
+
+      &.active {
+        background: $gradient-electric;
+        color: $background-dark;
+        border-color: transparent;
+      }
+    }
+  }
+
+  .latex-tab-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .latex-upload-area {
+    padding: 48px 32px;
+    border: 2px dashed $border-color;
+    border-radius: 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: $background-card;
+    cursor: pointer;
+    margin-bottom: 24px;
+
+    &:hover, &.drag-over {
+      border-color: $primary-color;
+      background: rgba($primary-color, 0.05);
+
+      .upload-icon {
+        color: $primary-color;
+        transform: translateY(-4px);
+      }
+    }
+
+    .upload-icon {
+      color: $text-secondary;
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+    }
+
+    p {
+      color: $text-primary;
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+
+    .upload-or {
+      display: block;
+      color: $text-secondary;
+      font-size: 0.875rem;
+      margin-bottom: 12px;
+    }
+
+    .upload-btn {
+      display: inline-block;
+      padding: 12px 28px;
+      background: $gradient-electric;
+      color: $background-dark;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        @include glow-effect($primary-color);
+      }
+    }
+
+    .file-types {
+      display: block;
+      margin-top: 16px;
+      color: $text-secondary;
+      font-size: 0.8rem;
+    }
+  }
+
+  .latex-input-area {
+    margin-bottom: 24px;
+
+    textarea {
+      width: 100%;
+      padding: 20px;
+      background: $background-card;
+      border: 1px solid $border-color;
+      border-radius: 12px;
+      color: $text-primary;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      resize: vertical;
+      transition: border-color 0.3s ease;
+
+      &::placeholder {
+        color: $text-secondary;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+      }
+    }
+  }
+
+  .latex-actions {
+    text-align: center;
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .latex-output {
+    background: $background-card;
+    border-radius: 12px;
+    border: 1px solid $border-color;
+    overflow: hidden;
+
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: rgba($primary-color, 0.1);
+      border-bottom: 1px solid $border-color;
+      flex-wrap: wrap;
+      gap: 12px;
+
+      h3 {
+        color: $text-primary;
+        font-size: 1rem;
+        margin: 0;
+      }
+
+      .output-actions {
+        display: flex;
+        gap: 8px;
+
+        .btn {
+          padding: 8px 16px;
+          font-size: 0.875rem;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+        }
+      }
+    }
+
+    .latex-code {
+      padding: 20px;
+      margin: 0;
+      max-height: 400px;
+      overflow: auto;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: $text-primary;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  }
+
+  .latex-message {
+    max-width: 500px;
+    margin: 24px auto;
+    text-align: center;
+
+    p {
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+
+      &.success {
+        background: rgba($secondary-color, 0.15);
+        color: $secondary-color;
+        border: 1px solid rgba($secondary-color, 0.3);
+      }
+
+      &.error {
+        background: rgba($accent-color, 0.15);
+        color: $accent-color;
+        border: 1px solid rgba($accent-color, 0.3);
+      }
+    }
+  }
+
+  .latex-features {
+    margin-top: 48px;
+    text-align: center;
+
+    h4 {
+      color: $text-primary;
+      margin-bottom: 20px;
+      font-size: 1rem;
+    }
+
+    .features-grid {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: $background-card;
+      border-radius: 20px;
+      border: 1px solid $border-color;
+
+      .feature-icon {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $primary-color;
+        font-weight: bold;
+        font-size: 0.9rem;
+      }
+
+      span:last-child {
+        color: $text-secondary;
+        font-size: 0.875rem;
+      }
+    }
+  }
+}
+
 // Publications Section
 .publications-section {
-  background: $background-dark;
+  background: $background-card;
   position: relative;
 
   &::before {
@@ -1660,6 +1931,54 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
         .col-link a {
           font-size: 0.75rem;
         }
+      }
+    }
+  }
+
+  // LaTeX Tool section mobile
+  .latex-tool-section {
+    .latex-tabs {
+      flex-direction: column;
+      align-items: stretch;
+      max-width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .latex-upload-area {
+      padding: 32px 20px;
+    }
+
+    .latex-output {
+      .output-header {
+        flex-direction: column;
+        align-items: flex-start;
+
+        .output-actions {
+          width: 100%;
+          flex-direction: column;
+
+          .btn {
+            width: 100%;
+            justify-content: center;
+          }
+        }
+      }
+
+      .latex-code {
+        font-size: 0.75rem;
+        max-height: 300px;
+      }
+    }
+
+    .latex-features {
+      .features-grid {
+        gap: 8px;
+      }
+
+      .feature-item {
+        padding: 6px 12px;
+        font-size: 0.8rem;
       }
     }
   }

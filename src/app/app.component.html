@@ -13,6 +13,7 @@
       <a (click)="scrollToSection('pcb-design')">PCB Design</a>
       <a (click)="scrollToSection('tools')">Tools</a>
       <a (click)="scrollToSection('bom-tool')">BOM Tool</a>
+      <a (click)="scrollToSection('latex-tool')">LaTeX Tool</a>
       <a (click)="scrollToSection('publications')">Publications</a>
       <a (click)="scrollToSection('contact')">Contact</a>
     </div>
@@ -48,6 +49,7 @@
       <a (click)="scrollToSectionMobile('pcb-design')">PCB Design</a>
       <a (click)="scrollToSectionMobile('tools')">Tools</a>
       <a (click)="scrollToSectionMobile('bom-tool')">BOM Tool</a>
+      <a (click)="scrollToSectionMobile('latex-tool')">LaTeX Tool</a>
       <a (click)="scrollToSectionMobile('publications')">Publications</a>
       <a (click)="scrollToSectionMobile('contact')">Contact</a>
     </div>
@@ -395,6 +397,134 @@
 
       <div class="bom-message" *ngIf="bomMessage">
         <p [class.error]="bomMessageType === 'error'" [class.success]="bomMessageType === 'success'">{{ bomMessage }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LaTeX Tool Section -->
+  <section id="latex-tool" class="section latex-tool-section">
+    <div class="section-content">
+      <h2 class="section-title">Word & LaTeX Converter</h2>
+      <p class="latex-description">Convert between Word documents and LaTeX code for academic writing.</p>
+
+      <!-- Tab Buttons -->
+      <div class="latex-tabs">
+        <button [class.active]="latexActiveTab === 'word-to-latex'" (click)="latexActiveTab = 'word-to-latex'">
+          Word to LaTeX
+        </button>
+        <button [class.active]="latexActiveTab === 'latex-to-word'" (click)="latexActiveTab = 'latex-to-word'">
+          LaTeX to Word
+        </button>
+      </div>
+
+      <!-- Word to LaTeX Tab -->
+      <div class="latex-tab-content" *ngIf="latexActiveTab === 'word-to-latex'">
+        <div class="latex-upload-area"
+             [class.drag-over]="isLatexDragOver"
+             (dragover)="onLatexDragOver($event)"
+             (dragleave)="onLatexDragLeave($event)"
+             (drop)="onLatexDrop($event)">
+          <div class="upload-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </div>
+          <p>Drag & drop your Word file here</p>
+          <span class="upload-or">or</span>
+          <label class="upload-btn">
+            <input type="file" accept=".docx" (change)="onWordFileSelect($event)" hidden>
+            Browse Files
+          </label>
+          <span class="file-types">Supported: .docx</span>
+        </div>
+
+        <div class="latex-output" *ngIf="latexOutput">
+          <div class="output-header">
+            <h3>LaTeX Output</h3>
+            <div class="output-actions">
+              <button class="btn btn-secondary" (click)="copyLatexOutput()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy
+              </button>
+              <button class="btn btn-primary" (click)="downloadLatexFile()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download .tex
+              </button>
+            </div>
+          </div>
+          <pre class="latex-code">{{ latexOutput }}</pre>
+        </div>
+      </div>
+
+      <!-- LaTeX to Word Tab -->
+      <div class="latex-tab-content" *ngIf="latexActiveTab === 'latex-to-word'">
+        <div class="latex-input-area">
+          <textarea
+            [(ngModel)]="latexInput"
+            placeholder="Paste your LaTeX code here...
+
+Example:
+\documentclass{article}
+\begin{document}
+\section{Introduction}
+This is a sample document with \textbf{bold} and \textit{italic} text.
+\end{document}"
+            rows="12"></textarea>
+        </div>
+        <div class="latex-actions">
+          <button class="btn btn-primary" (click)="convertLatexToWord()" [disabled]="!latexInput.trim()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            Convert & Download Word
+          </button>
+        </div>
+      </div>
+
+      <div class="latex-message" *ngIf="latexMessage">
+        <p [class.error]="latexMessageType === 'error'" [class.success]="latexMessageType === 'success'">{{ latexMessage }}</p>
+      </div>
+
+      <div class="latex-features">
+        <h4>Supported Conversions:</h4>
+        <div class="features-grid">
+          <div class="feature-item">
+            <span class="feature-icon">B</span>
+            <span>Bold text</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon"><em>I</em></span>
+            <span>Italic text</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">H</span>
+            <span>Headings</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">&bull;</span>
+            <span>Lists</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">&#8747;</span>
+            <span>Equations</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">&#182;</span>
+            <span>Paragraphs</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
