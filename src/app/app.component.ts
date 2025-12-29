@@ -304,7 +304,7 @@ export class AppComponent {
         this.bomData = jsonData.slice(1);
 
         // Auto-detect part number column
-        const partNumberPatterns = ['part number', 'part no', 'partno', 'mpn', 'manufacturer part', 'mfr part', 'p/n', 'pn'];
+        const partNumberPatterns = ['part number', 'part no', 'partno', 'mpn', 'manufacturer part', 'mfr part', 'p/n', 'pn', 'comment', 'libref', 'value'];
         const autoDetectedCol = this.bomColumns.find(col =>
           partNumberPatterns.some(pattern => col.toLowerCase().includes(pattern))
         );
