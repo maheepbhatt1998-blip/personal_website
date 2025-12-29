@@ -807,6 +807,28 @@ export class AppComponent implements OnInit, OnDestroy {
   private animationFrameId: number | null = null;
   private switchInterval: any = null;
 
+  get recommendedSwitch(): { type: string; description: string; color: string } {
+    if (this.switchingFrequency <= 2) {
+      return {
+        type: 'IGBT + Diode',
+        description: 'Best for low frequency (1-2 kHz). High current capability, lower switching losses at low frequencies.',
+        color: '#ff6b6b'
+      };
+    } else if (this.switchingFrequency <= 80) {
+      return {
+        type: 'SiC MOSFET',
+        description: 'Optimal for medium-high frequency (2-80 kHz). Lower switching losses, higher efficiency than IGBT.',
+        color: '#00d4ff'
+      };
+    } else {
+      return {
+        type: 'GaN MOSFET',
+        description: 'Best for high frequency (80-100 kHz). Fastest switching, lowest losses at high frequencies.',
+        color: '#00ff88'
+      };
+    }
+  }
+
   ngOnInit(): void {
     this.updateWaveform();
     this.startSwitchAnimation();

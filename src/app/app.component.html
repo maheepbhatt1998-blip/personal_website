@@ -616,6 +616,29 @@ This is a sample document with \textbf{bold} and \textit{italic} text.
           </div>
         </div>
 
+        <!-- Switch Recommendation -->
+        <div class="switch-recommendation">
+          <div class="recommendation-badge" [style.border-color]="recommendedSwitch.color">
+            <span class="badge-label">Recommended Switch</span>
+            <span class="badge-type" [style.color]="recommendedSwitch.color">{{ recommendedSwitch.type }}</span>
+          </div>
+          <p class="recommendation-desc">{{ recommendedSwitch.description }}</p>
+          <div class="switch-ranges">
+            <div class="range-item" [class.active]="switchingFrequency <= 2">
+              <span class="range-freq">1-2 kHz</span>
+              <span class="range-switch">IGBT + Diode</span>
+            </div>
+            <div class="range-item" [class.active]="switchingFrequency > 2 && switchingFrequency <= 80">
+              <span class="range-freq">2-80 kHz</span>
+              <span class="range-switch">SiC MOSFET</span>
+            </div>
+            <div class="range-item" [class.active]="switchingFrequency > 80">
+              <span class="range-freq">80-100 kHz</span>
+              <span class="range-switch">GaN MOSFET</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Schematic Visualization -->
         <div class="inverter-schematic">
           <svg viewBox="0 0 400 200" class="schematic-svg">

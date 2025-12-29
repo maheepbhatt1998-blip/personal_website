@@ -2038,6 +2038,110 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
     }
   }
 
+  .switch-recommendation {
+    background: $background-dark;
+    border-radius: 12px;
+    border: 1px solid $border-color;
+    padding: 24px;
+    text-align: center;
+
+    .recommendation-badge {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 32px;
+      background: rgba($primary-color, 0.05);
+      border: 2px solid $primary-color;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      transition: border-color 0.3s ease;
+
+      .badge-label {
+        font-size: 0.8rem;
+        color: $text-secondary;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+      }
+
+      .badge-type {
+        font-size: 1.5rem;
+        font-weight: 700;
+        transition: color 0.3s ease;
+      }
+    }
+
+    .recommendation-desc {
+      color: $text-secondary;
+      font-size: 0.95rem;
+      max-width: 500px;
+      margin: 0 auto 20px;
+      line-height: 1.5;
+    }
+
+    .switch-ranges {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+
+      .range-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 12px 20px;
+        background: rgba($border-color, 0.3);
+        border-radius: 8px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        min-width: 120px;
+
+        .range-freq {
+          font-size: 0.8rem;
+          color: $text-secondary;
+          margin-bottom: 4px;
+        }
+
+        .range-switch {
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: $text-primary;
+        }
+
+        &.active {
+          background: rgba($primary-color, 0.1);
+          border-color: $primary-color;
+
+          .range-freq {
+            color: $primary-color;
+          }
+
+          .range-switch {
+            color: $primary-color;
+          }
+        }
+
+        &:nth-child(1).active {
+          border-color: #ff6b6b;
+          background: rgba(#ff6b6b, 0.1);
+          .range-freq, .range-switch { color: #ff6b6b; }
+        }
+
+        &:nth-child(2).active {
+          border-color: #00d4ff;
+          background: rgba(#00d4ff, 0.1);
+          .range-freq, .range-switch { color: #00d4ff; }
+        }
+
+        &:nth-child(3).active {
+          border-color: #00ff88;
+          background: rgba(#00ff88, 0.1);
+          .range-freq, .range-switch { color: #00ff88; }
+        }
+      }
+    }
+  }
+
   .inverter-schematic {
     background: $background-dark;
     border-radius: 12px;
@@ -2526,6 +2630,39 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
 
     .frequency-control {
       min-width: 100%;
+    }
+
+    .switch-recommendation {
+      padding: 16px;
+
+      .recommendation-badge {
+        padding: 12px 24px;
+
+        .badge-type {
+          font-size: 1.25rem;
+        }
+      }
+
+      .recommendation-desc {
+        font-size: 0.85rem;
+      }
+
+      .switch-ranges {
+        gap: 8px;
+
+        .range-item {
+          min-width: 100px;
+          padding: 10px 14px;
+
+          .range-freq {
+            font-size: 0.7rem;
+          }
+
+          .range-switch {
+            font-size: 0.8rem;
+          }
+        }
+      }
     }
 
     .inverter-schematic {
