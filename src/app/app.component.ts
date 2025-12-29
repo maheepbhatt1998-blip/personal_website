@@ -511,16 +511,28 @@ export class AppComponent {
   htmlToLatex(html: string): string {
     let latex = html;
 
-    // Document structure
-    let preamble = `\\documentclass{article}
-\\usepackage[utf8]{inputenc}
-\\usepackage{amsmath}
-\\usepackage{graphicx}
-\\usepackage{hyperref}
+    // First, decode HTML entities
+    latex = latex.replace(/&nbsp;/g, ' ');
+    latex = latex.replace(/&amp;/g, '&');
+    latex = latex.replace(/&lt;/g, '<');
+    latex = latex.replace(/&gt;/g, '>');
+    latex = latex.replace(/&quot;/g, '"');
+    latex = latex.replace(/&#39;/g, "'");
 
-\\begin{document}
+    // Extract text content and escape special LaTeX characters FIRST
+    // We need to do this carefully to not break HTML tags
+    const escapeLatexChars = (text: string): string => {
+      return text
+        .replace(/\\/g, '\\textbackslash{}')
+        .replace(/([&%$#_{}])/g, '\\$1')
+        .replace(/\^/g, '\\textasciicircum{}')
+        .replace(/~/g, '\\textasciitilde{}');
+    };
 
-`;
+    // Process text between tags - escape special chars in content only
+    latex = latex.replace(/>([^<]+)</g, (match, content) => {
+      return '>' + escapeLatexChars(content) + '<';
+    });
 
     // Convert headings
     latex = latex.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '\\section{$1}\n');
@@ -552,24 +564,45 @@ export class AppComponent {
     // Convert line breaks
     latex = latex.replace(/<br\s*\/?>/gi, '\\\\\n');
 
-    // Convert links
-    latex = latex.replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '\\href{$1}{$2}');
+    // Convert links - need to unescape the URL
+    latex = latex.replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, (match, url, text) => {
+      // Unescape URL (it may have been escaped)
+      const cleanUrl = url.replace(/\\([&%$#_{}])/g, '$1');
+      return `\\href{${cleanUrl}}{${text}}`;
+    });
 
     // Remove remaining HTML tags
     latex = latex.replace(/<[^>]+>/g, '');
 
-    // Escape special LaTeX characters (be careful not to double-escape)
-    latex = latex.replace(/&amp;/g, '\\&');
-    latex = latex.replace(/&lt;/g, '<');
-    latex = latex.replace(/&gt;/g, '>');
-    latex = latex.replace(/&nbsp;/g, ' ');
-    latex = latex.replace(/%/g, '\\%');
-    latex = latex.replace(/#/g, '\\#');
-    latex = latex.replace(/\$/g, '\\$');
-
     // Clean up extra whitespace
     latex = latex.replace(/\n{3,}/g, '\n\n');
     latex = latex.trim();
+
+    // Escape title for LaTeX
+    const safeTitle = this.currentFileName
+      .replace(/\\/g, '\\textbackslash{}')
+      .replace(/([&%$#_{}])/g, '\\$1')
+      .replace(/\^/g, '\\textasciicircum{}')
+      .replace(/~/g, '\\textasciitilde{}');
+
+    // Document structure
+    const preamble = `\\documentclass{article}
+\\usepackage[utf8]{inputenc}
+\\usepackage[T1]{fontenc}
+\\usepackage{amsmath}
+\\usepackage{amssymb}
+\\usepackage{graphicx}
+\\usepackage{hyperref}
+\\usepackage{textcomp}
+
+\\title{${safeTitle}}
+\\date{}
+
+\\begin{document}
+
+\\maketitle
+
+`;
 
     return preamble + latex + '\n\n\\end{document}';
   }
