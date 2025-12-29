@@ -407,30 +407,31 @@ export class AppComponent {
     this.bomMessageType = '';
 
     try {
-      // Build FastAdd URL parameters (client-side approach)
-      // This avoids server-side Cloudflare blocking
-      const params = new URLSearchParams();
-
-      this.bomResults.forEach((item, index) => {
-        const num = index + 1;
-        params.append(`part${num}`, item.partNumber);
-        params.append(`qty${num}`, item.quantity.toString());
+      // Generate CSV content for DigiKey BOM Manager
+      // This allows users to select packaging (Cut Tape vs Tape & Reel)
+      const csvLines = ['Quantity,Part Number'];
+      this.bomResults.forEach(item => {
+        csvLines.push(`${item.quantity},"${item.partNumber}"`);
       });
+      const csvContent = csvLines.join('\n');
 
-      // FastAdd URL - opens DigiKey directly with parts
-      const fastAddUrl = `https://www.digikey.com/classic/ordering/fastadd.aspx?${params.toString()}`;
+      // Create downloadable CSV file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
 
-      // Check URL length - FastAdd has ~2000 char limit
-      if (fastAddUrl.length > 2000) {
-        // For long BOMs, use BOM Manager import instead
-        this.digiKeyCartUrl = '';
-        this.bomMessage = `BOM has ${this.bomResults.length} parts. URL too long for FastAdd. Use "Copy All Links" and import to DigiKey BOM Manager.`;
-        this.bomMessageType = 'error';
-      } else {
-        this.digiKeyCartUrl = fastAddUrl;
-        this.bomMessage = 'DigiKey FastAdd link ready! Click to add parts to cart.';
-        this.bomMessageType = 'success';
-      }
+      // Trigger download
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'digikey_bom.csv';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      // Set URL to DigiKey BOM Manager
+      this.digiKeyCartUrl = 'https://www.digikey.com/BOM';
+      this.bomMessage = 'CSV downloaded! Click below to open DigiKey BOM Manager, then upload the CSV file. You can select Cut Tape (CT) packaging for each part.';
+      this.bomMessageType = 'success';
     } catch (error) {
       console.error('Error creating DigiKey cart:', error);
       this.bomMessage = `Failed to create DigiKey link: ${error instanceof Error ? error.message : 'Unknown error'}`;
