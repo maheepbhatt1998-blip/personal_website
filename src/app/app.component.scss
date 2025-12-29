@@ -1066,6 +1066,160 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
   100% { background-position: 100% 0; }
 }
 
+// Hamburger Menu
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1001;
+
+  .hamburger-line {
+    width: 24px;
+    height: 2px;
+    background: $text-primary;
+    transition: all 0.3s ease;
+    margin: 3px 0;
+  }
+
+  &.active {
+    .hamburger-line:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+    .hamburger-line:nth-child(2) {
+      opacity: 0;
+    }
+    .hamburger-line:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+  }
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+}
+
+// Mobile Navigation Overlay
+.mobile-nav-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 998;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  &.active {
+    opacity: 1;
+  }
+
+  @media (max-width: 768px) {
+    display: block;
+    pointer-events: none;
+
+    &.active {
+      pointer-events: auto;
+    }
+  }
+}
+
+// Mobile Navigation Drawer
+.mobile-nav {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: -280px;
+  width: 280px;
+  height: 100vh;
+  background: $background-card;
+  z-index: 999;
+  transition: right 0.3s ease;
+  flex-direction: column;
+  border-left: 1px solid $border-color;
+
+  &.active {
+    right: 0;
+  }
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+
+  .mobile-nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid $border-color;
+
+    .mobile-nav-brand {
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: $gradient-electric;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: $text-secondary;
+      cursor: pointer;
+      padding: 8px;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: $primary-color;
+      }
+    }
+  }
+
+  .mobile-nav-links {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+
+    a {
+      display: block;
+      padding: 16px 20px;
+      color: $text-primary;
+      text-decoration: none;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      margin-bottom: 4px;
+
+      &:hover {
+        background: rgba($primary-color, 0.1);
+        color: $primary-color;
+        padding-left: 28px;
+      }
+    }
+  }
+
+  .mobile-nav-footer {
+    padding: 20px;
+    border-top: 1px solid $border-color;
+
+    .btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+}
+
 // Footer
 .footer {
   background: $background-dark;
@@ -1106,7 +1260,7 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
   .navbar {
     padding: 15px 20px;
 
-    .nav-links {
+    .desktop-nav {
       display: none;
     }
   }
@@ -1117,25 +1271,39 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
     .hero-content {
       flex-direction: column-reverse;
       text-align: center;
+      gap: 40px;
     }
 
     .hero-text {
       h1 {
-        font-size: 2.5rem;
+        font-size: 2rem;
+      }
+
+      h2 {
+        font-size: 1.125rem;
       }
 
       .hero-description {
         margin: 0 auto 32px;
+        font-size: 1rem;
       }
     }
 
     .hero-buttons {
       justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+
+      .btn {
+        width: 100%;
+        max-width: 250px;
+      }
     }
 
     .profile-image {
-      width: 200px;
-      height: 200px;
+      width: 180px;
+      height: 180px;
     }
   }
 
@@ -1143,13 +1311,160 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
     justify-content: center;
   }
 
-  .section .section-title {
-    font-size: 2rem;
+  .section {
+    .section-content {
+      padding: 60px 16px;
+    }
+
+    .section-title {
+      font-size: 1.75rem;
+      margin-bottom: 32px;
+    }
+  }
+
+  // Experience section mobile
+  .experience-section {
+    .timeline-item {
+      gap: 16px;
+    }
+
+    .timeline-content {
+      padding: 20px;
+
+      h3 {
+        font-size: 1.125rem;
+      }
+    }
+  }
+
+  // Education section mobile
+  .education-section {
+    .education-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .education-card {
+      padding: 24px;
+    }
+  }
+
+  // Skills section mobile
+  .skills-section {
+    .skills-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .skill-card {
+      padding: 16px 12px;
+    }
+
+    .skill-icon {
+      width: 36px;
+      height: 36px;
+    }
+
+    .skill-name {
+      font-size: 0.75rem;
+    }
+  }
+
+  // Research section mobile
+  .research-section {
+    .research-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .research-card {
+      padding: 24px;
+    }
+  }
+
+  // PCB section mobile
+  .pcb-section {
+    .pcb-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .pcb-card {
+      padding: 24px;
+    }
+  }
+
+  // Tools section mobile
+  .tools-section {
+    .tools-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .tool-card {
+      padding: 16px;
+
+      h3 {
+        font-size: 0.9rem;
+      }
+
+      p {
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  // Publications section mobile
+  .publications-section {
+    .publication-card {
+      padding: 20px;
+
+      h3 {
+        font-size: 1rem;
+      }
+    }
+  }
+
+  // Contact section mobile
+  .contact-section {
+    .contact-methods {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .contact-card {
+      width: 100%;
+      max-width: 300px;
+      padding: 20px 24px;
+    }
   }
 
   .footer .footer-content {
     flex-direction: column;
     gap: 16px;
     text-align: center;
+  }
+}
+
+// Extra small devices
+@media (max-width: 480px) {
+  .hero {
+    .hero-text h1 {
+      font-size: 1.75rem;
+    }
+
+    .profile-image {
+      width: 150px;
+      height: 150px;
+    }
+  }
+
+  .skills-section {
+    .skills-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .tools-section {
+    .tools-grid {
+      grid-template-columns: 1fr;
+    }
   }
 }

@@ -192,10 +192,30 @@ export class AppComponent {
 
   currentYear = new Date().getFullYear();
 
+  // Mobile menu state
+  mobileMenuOpen = false;
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+    // Prevent body scroll when menu is open
+    document.body.style.overflow = this.mobileMenuOpen ? 'hidden' : '';
+  }
+
   scrollToSection(sectionId: string): void {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
+  }
+
+  scrollToSectionMobile(sectionId: string): void {
+    this.mobileMenuOpen = false;
+    document.body.style.overflow = '';
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 300);
   }
 }
