@@ -26,7 +26,10 @@
       "Bash(vercel link:*)",
       "Bash(vercel git connect:*)",
       "Bash(vercel:*)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "WebFetch(domain:developer.digikey.com)",
+      "WebSearch",
+      "WebFetch(domain:forum.digikey.com)"
     ]
   }
 }

@@ -14,6 +14,7 @@
       <a (click)="scrollToSection('tools')">Tools</a>
       <a (click)="scrollToSection('bom-tool')">BOM Tool</a>
       <a (click)="scrollToSection('latex-tool')">LaTeX Tool</a>
+      <a (click)="scrollToSection('inverter-demo')">Inverter Demo</a>
       <a (click)="scrollToSection('publications')">Publications</a>
       <a (click)="scrollToSection('contact')">Contact</a>
     </div>
@@ -50,6 +51,7 @@
       <a (click)="scrollToSectionMobile('tools')">Tools</a>
       <a (click)="scrollToSectionMobile('bom-tool')">BOM Tool</a>
       <a (click)="scrollToSectionMobile('latex-tool')">LaTeX Tool</a>
+      <a (click)="scrollToSectionMobile('inverter-demo')">Inverter Demo</a>
       <a (click)="scrollToSectionMobile('publications')">Publications</a>
       <a (click)="scrollToSectionMobile('contact')">Contact</a>
     </div>
@@ -580,6 +582,274 @@ This is a sample document with \textbf{bold} and \textit{italic} text.
           <div class="feature-item">
             <span class="feature-icon">&#182;</span>
             <span>Paragraphs</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Inverter Demo Section -->
+  <section id="inverter-demo" class="section inverter-demo-section">
+    <div class="section-content">
+      <h2 class="section-title">VSI vs CSI Interactive Demo</h2>
+      <p class="inverter-description">Explore the fundamental differences between Voltage Source Inverters (VSI) and Current Source Inverters (CSI) in power electronics.</p>
+
+      <div class="inverter-widget">
+        <!-- Controls -->
+        <div class="inverter-controls">
+          <div class="inverter-toggle">
+            <span class="toggle-label" [class.active]="inverterType === 'VSI'">VSI</span>
+            <label class="toggle-switch">
+              <input type="checkbox" [checked]="inverterType === 'CSI'" (change)="toggleInverterType()">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label" [class.active]="inverterType === 'CSI'">CSI</span>
+          </div>
+
+          <div class="frequency-control">
+            <label>Switching Frequency: <strong>{{ switchingFrequency }} kHz</strong></label>
+            <input type="range" min="1" max="20" step="1" [(ngModel)]="switchingFrequency" (input)="updateWaveform()">
+            <div class="freq-labels">
+              <span>1 kHz</span>
+              <span>20 kHz</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Schematic Visualization -->
+        <div class="inverter-schematic">
+          <svg viewBox="0 0 400 200" class="schematic-svg">
+            <!-- DC Source -->
+            <g class="dc-source">
+              <line x1="20" y1="60" x2="20" y2="140" stroke="currentColor" stroke-width="2"/>
+              <text x="10" y="105" class="schematic-label">+</text>
+              <text x="10" y="85" class="schematic-label">−</text>
+              <line x1="20" y1="60" x2="60" y2="60" stroke="currentColor" stroke-width="2"/>
+              <line x1="20" y1="140" x2="60" y2="140" stroke="currentColor" stroke-width="2"/>
+            </g>
+
+            <!-- DC Link Element (Capacitor for VSI, Inductor for CSI) -->
+            <g class="dc-link" [class.capacitor]="inverterType === 'VSI'" [class.inductor]="inverterType === 'CSI'">
+              <!-- Capacitor (VSI) -->
+              <g *ngIf="inverterType === 'VSI'" class="capacitor-symbol">
+                <line x1="80" y1="70" x2="80" y2="130" stroke="#00d4ff" stroke-width="3"/>
+                <line x1="95" y1="70" x2="95" y2="130" stroke="#00d4ff" stroke-width="3"/>
+                <line x1="60" y1="60" x2="80" y2="60" stroke="currentColor" stroke-width="2"/>
+                <line x1="80" y1="60" x2="80" y2="70" stroke="currentColor" stroke-width="2"/>
+                <line x1="95" y1="60" x2="95" y2="70" stroke="currentColor" stroke-width="2"/>
+                <line x1="95" y1="60" x2="120" y2="60" stroke="currentColor" stroke-width="2"/>
+                <line x1="60" y1="140" x2="80" y2="140" stroke="currentColor" stroke-width="2"/>
+                <line x1="80" y1="130" x2="80" y2="140" stroke="currentColor" stroke-width="2"/>
+                <line x1="95" y1="130" x2="95" y2="140" stroke="currentColor" stroke-width="2"/>
+                <line x1="95" y1="140" x2="120" y2="140" stroke="currentColor" stroke-width="2"/>
+                <text x="87" y="165" class="component-label">C</text>
+              </g>
+              <!-- Inductor (CSI) -->
+              <g *ngIf="inverterType === 'CSI'" class="inductor-symbol">
+                <line x1="60" y1="60" x2="70" y2="60" stroke="currentColor" stroke-width="2"/>
+                <path d="M70,60 Q80,40 90,60 Q100,80 110,60" fill="none" stroke="#00d4ff" stroke-width="3"/>
+                <line x1="110" y1="60" x2="120" y2="60" stroke="currentColor" stroke-width="2"/>
+                <line x1="60" y1="140" x2="120" y2="140" stroke="currentColor" stroke-width="2"/>
+                <text x="85" y="45" class="component-label">L</text>
+              </g>
+            </g>
+
+            <!-- Inverter Bridge -->
+            <g class="inverter-bridge">
+              <rect x="140" y="50" width="100" height="100" fill="none" stroke="currentColor" stroke-width="2" rx="5"/>
+              <text x="190" y="105" text-anchor="middle" class="bridge-label">H-Bridge</text>
+
+              <!-- Animated switches -->
+              <g class="switch sw1" [class.on]="switchState[0]">
+                <rect x="150" y="60" width="20" height="15" [attr.fill]="switchState[0] ? '#00ff88' : '#333'" rx="2"/>
+              </g>
+              <g class="switch sw2" [class.on]="switchState[1]">
+                <rect x="210" y="60" width="20" height="15" [attr.fill]="switchState[1] ? '#00ff88' : '#333'" rx="2"/>
+              </g>
+              <g class="switch sw3" [class.on]="switchState[2]">
+                <rect x="150" y="125" width="20" height="15" [attr.fill]="switchState[2] ? '#00ff88' : '#333'" rx="2"/>
+              </g>
+              <g class="switch sw4" [class.on]="switchState[3]">
+                <rect x="210" y="125" width="20" height="15" [attr.fill]="switchState[3] ? '#00ff88' : '#333'" rx="2"/>
+              </g>
+            </g>
+
+            <!-- Output -->
+            <g class="output">
+              <line x1="240" y1="60" x2="280" y2="60" stroke="currentColor" stroke-width="2"/>
+              <line x1="240" y1="140" x2="280" y2="140" stroke="currentColor" stroke-width="2"/>
+
+              <!-- Output Filter -->
+              <g *ngIf="inverterType === 'VSI'">
+                <path d="M280,60 Q290,40 300,60 Q310,80 320,60" fill="none" stroke="#ff6b6b" stroke-width="2"/>
+                <line x1="340" y1="50" x2="340" y2="70" stroke="#ff6b6b" stroke-width="2"/>
+                <line x1="350" y1="50" x2="350" y2="70" stroke="#ff6b6b" stroke-width="2"/>
+                <text x="315" y="90" class="filter-label">LC Filter</text>
+              </g>
+              <g *ngIf="inverterType === 'CSI'">
+                <line x1="290" y1="50" x2="290" y2="70" stroke="#ff6b6b" stroke-width="2"/>
+                <line x1="300" y1="50" x2="300" y2="70" stroke="#ff6b6b" stroke-width="2"/>
+                <text x="295" y="90" class="filter-label">C Filter</text>
+              </g>
+
+              <!-- Load -->
+              <circle cx="370" cy="100" r="20" fill="none" stroke="currentColor" stroke-width="2"/>
+              <text x="370" y="105" text-anchor="middle" class="load-label">Load</text>
+            </g>
+
+            <!-- Energy flow indicator -->
+            <g class="energy-flow">
+              <circle [attr.cx]="energyFlowX" cy="60" r="4" fill="#00ff88" class="energy-particle"/>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Waveform Display -->
+        <div class="waveform-display">
+          <h4>Output Waveform ({{ inverterType === 'VSI' ? 'Voltage' : 'Current' }} Ripple)</h4>
+          <svg viewBox="0 0 400 150" class="waveform-svg">
+            <!-- Grid -->
+            <defs>
+              <pattern id="grid" width="40" height="30" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 30" fill="none" stroke="#333" stroke-width="0.5"/>
+              </pattern>
+            </defs>
+            <rect width="400" height="150" fill="url(#grid)"/>
+
+            <!-- Axes -->
+            <line x1="40" y1="75" x2="380" y2="75" stroke="#666" stroke-width="1"/>
+            <line x1="40" y1="20" x2="40" y2="130" stroke="#666" stroke-width="1"/>
+
+            <!-- Labels -->
+            <text x="210" y="145" text-anchor="middle" class="axis-label">Time</text>
+            <text x="15" y="75" text-anchor="middle" class="axis-label" transform="rotate(-90, 15, 75)">Amplitude</text>
+
+            <!-- Ideal waveform -->
+            <path [attr.d]="idealWaveformPath" fill="none" stroke="#00d4ff" stroke-width="2" stroke-dasharray="5,5"/>
+
+            <!-- Actual waveform with ripple -->
+            <path [attr.d]="actualWaveformPath" fill="none" stroke="#00ff88" stroke-width="2"/>
+
+            <!-- Ripple annotation -->
+            <g class="ripple-annotation" transform="translate(320, 40)">
+              <line x1="0" y1="0" x2="0" [attr.y2]="rippleHeight" stroke="#ff6b6b" stroke-width="2"/>
+              <line x1="-5" y1="0" x2="5" y2="0" stroke="#ff6b6b" stroke-width="2"/>
+              <line x1="-5" [attr.y1]="rippleHeight" x2="5" [attr.y2]="rippleHeight" stroke="#ff6b6b" stroke-width="2"/>
+              <text x="15" [attr.y]="rippleHeight/2" class="ripple-label">Ripple</text>
+            </g>
+          </svg>
+          <div class="waveform-legend">
+            <span class="legend-item"><span class="legend-color ideal"></span> Ideal</span>
+            <span class="legend-item"><span class="legend-color actual"></span> Actual</span>
+            <span class="legend-item"><span class="legend-color ripple"></span> Ripple: {{ ripplePercentage }}%</span>
+          </div>
+        </div>
+
+        <!-- Explanation Panel -->
+        <div class="inverter-explanation">
+          <div class="explanation-header">
+            <h4>{{ inverterType === 'VSI' ? 'Voltage Source Inverter (VSI)' : 'Current Source Inverter (CSI)' }}</h4>
+          </div>
+
+          <div class="explanation-content" *ngIf="inverterType === 'VSI'">
+            <div class="explanation-item">
+              <span class="item-icon">⚡</span>
+              <div class="item-text">
+                <strong>DC Link:</strong> Large capacitor maintains constant DC voltage (V<sub>dc</sub>)
+              </div>
+            </div>
+            <div class="explanation-item">
+              <span class="item-icon">🔋</span>
+              <div class="item-text">
+                <strong>Energy Storage:</strong> E = ½CV² (Capacitor stores energy in electric field)
+              </div>
+            </div>
+            <div class="explanation-item">
+              <span class="item-icon">📊</span>
+              <div class="item-text">
+                <strong>Output:</strong> PWM voltage waveform → filtered to produce sinusoidal current
+              </div>
+            </div>
+            <div class="explanation-item">
+              <span class="item-icon">📉</span>
+              <div class="item-text">
+                <strong>Ripple vs f<sub>sw</sub>:</strong> Current ripple ∝ 1/f<sub>sw</sub> (higher frequency = lower ripple)
+              </div>
+            </div>
+            <div class="explanation-item highlight">
+              <span class="item-icon">💡</span>
+              <div class="item-text">
+                At {{ switchingFrequency }} kHz, ripple is reduced by {{ (switchingFrequency / 1).toFixed(0) }}× compared to 1 kHz baseline
+              </div>
+            </div>
+          </div>
+
+          <div class="explanation-content" *ngIf="inverterType === 'CSI'">
+            <div class="explanation-item">
+              <span class="item-icon">⚡</span>
+              <div class="item-text">
+                <strong>DC Link:</strong> Large inductor maintains constant DC current (I<sub>dc</sub>)
+              </div>
+            </div>
+            <div class="explanation-item">
+              <span class="item-icon">🔋</span>
+              <div class="item-text">
+                <strong>Energy Storage:</strong> E = ½LI² (Inductor stores energy in magnetic field)
+              </div>
+            </div>
+            <div class="explanation-item">
+              <span class="item-icon">📊</span>
+              <div class="item-text">
+                <strong>Output:</strong> PWM current waveform → filtered to produce sinusoidal voltage
+              </div>
+            </div>
+            <div class="explanation-item">
+              <span class="item-icon">📉</span>
+              <div class="item-text">
+                <strong>Ripple vs f<sub>sw</sub>:</strong> Voltage ripple ∝ 1/f<sub>sw</sub> (similar scaling, different mechanism)
+              </div>
+            </div>
+            <div class="explanation-item highlight">
+              <span class="item-icon">💡</span>
+              <div class="item-text">
+                CSI requires switches with reverse-blocking capability (SCRs or IGBTs with series diodes)
+              </div>
+            </div>
+          </div>
+
+          <div class="key-differences">
+            <h5>Key Differences</h5>
+            <table class="comparison-table">
+              <thead>
+                <tr>
+                  <th>Parameter</th>
+                  <th>VSI</th>
+                  <th>CSI</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>DC Link</td>
+                  <td>Capacitor (C)</td>
+                  <td>Inductor (L)</td>
+                </tr>
+                <tr>
+                  <td>Controlled Variable</td>
+                  <td>Voltage</td>
+                  <td>Current</td>
+                </tr>
+                <tr>
+                  <td>Output Filter</td>
+                  <td>LC (for current)</td>
+                  <td>C (for voltage)</td>
+                </tr>
+                <tr>
+                  <td>Switch Type</td>
+                  <td>IGBT + Diode</td>
+                  <td>Reverse-blocking</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

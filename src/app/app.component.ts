@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
@@ -19,7 +19,7 @@ interface BomResult {
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy {
   // Personal Information
   name = 'Maheep Bhatt';
   title = 'PhD Candidate in Electrical Engineering';
@@ -793,5 +793,95 @@ export class AppComponent {
     }
 
     return runs;
+  }
+
+  // Inverter Demo properties
+  inverterType: 'VSI' | 'CSI' = 'VSI';
+  switchingFrequency = 10;
+  switchState = [true, false, false, true]; // SW1, SW2, SW3, SW4
+  energyFlowX = 20;
+  idealWaveformPath = '';
+  actualWaveformPath = '';
+  rippleHeight = 30;
+  ripplePercentage = 10;
+  private animationFrameId: number | null = null;
+  private switchInterval: any = null;
+
+  ngOnInit(): void {
+    this.updateWaveform();
+    this.startSwitchAnimation();
+    this.startEnergyFlowAnimation();
+  }
+
+  ngOnDestroy(): void {
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+    }
+    if (this.switchInterval) {
+      clearInterval(this.switchInterval);
+    }
+  }
+
+  toggleInverterType(): void {
+    this.inverterType = this.inverterType === 'VSI' ? 'CSI' : 'VSI';
+    this.updateWaveform();
+  }
+
+  updateWaveform(): void {
+    // Calculate ripple based on switching frequency (inversely proportional)
+    const baseRipple = 50; // Ripple at 1 kHz
+    this.ripplePercentage = Math.round(baseRipple / this.switchingFrequency);
+    this.rippleHeight = Math.max(5, 50 / this.switchingFrequency);
+
+    // Generate ideal sinusoidal waveform
+    const points = 340;
+    const startX = 40;
+    const centerY = 75;
+    const amplitude = 40;
+
+    let idealPath = `M ${startX} ${centerY}`;
+    let actualPath = `M ${startX} ${centerY}`;
+
+    for (let i = 0; i <= points; i++) {
+      const x = startX + i;
+      const t = (i / points) * 4 * Math.PI; // Two complete cycles
+
+      // Ideal sine wave
+      const idealY = centerY - amplitude * Math.sin(t);
+      idealPath += ` L ${x} ${idealY}`;
+
+      // Actual waveform with ripple
+      const rippleMagnitude = (baseRipple / this.switchingFrequency) * 0.4;
+      const rippleFreq = this.switchingFrequency * 2;
+      const ripple = rippleMagnitude * Math.sin(t * rippleFreq);
+      const actualY = centerY - amplitude * Math.sin(t) + ripple;
+      actualPath += ` L ${x} ${actualY}`;
+    }
+
+    this.idealWaveformPath = idealPath;
+    this.actualWaveformPath = actualPath;
+  }
+
+  startSwitchAnimation(): void {
+    // Animate switches at a visible rate (not actual switching frequency)
+    this.switchInterval = setInterval(() => {
+      // Toggle between two states: (SW1, SW4 on) and (SW2, SW3 on)
+      if (this.switchState[0]) {
+        this.switchState = [false, true, true, false];
+      } else {
+        this.switchState = [true, false, false, true];
+      }
+    }, Math.max(100, 1000 / this.switchingFrequency));
+  }
+
+  startEnergyFlowAnimation(): void {
+    const animate = () => {
+      this.energyFlowX += 2;
+      if (this.energyFlowX > 380) {
+        this.energyFlowX = 20;
+      }
+      this.animationFrameId = requestAnimationFrame(animate);
+    };
+    animate();
   }
 }
