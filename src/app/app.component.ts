@@ -407,38 +407,33 @@ export class AppComponent {
     this.bomMessageType = '';
 
     try {
-      // Prepare the request payload for DigiKey API
-      const parts = this.bomResults.map(item => ({
-        requestedPartNumber: item.partNumber,
-        quantities: [{ quantity: item.quantity }]
-      }));
+      // Build FastAdd URL parameters (client-side approach)
+      // This avoids server-side Cloudflare blocking
+      const params = new URLSearchParams();
 
-      // Call our serverless function proxy
-      const response = await fetch('/api/digikey-cart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(parts)
+      this.bomResults.forEach((item, index) => {
+        const num = index + 1;
+        params.append(`part${num}`, item.partNumber);
+        params.append(`qty${num}`, item.quantity.toString());
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-      }
+      // FastAdd URL - opens DigiKey directly with parts
+      const fastAddUrl = `https://www.digikey.com/classic/ordering/fastadd.aspx?${params.toString()}`;
 
-      const data = await response.json();
-
-      if (data.singleUseUrl) {
-        this.digiKeyCartUrl = data.singleUseUrl;
-        this.bomMessage = 'DigiKey cart created successfully!';
-        this.bomMessageType = 'success';
+      // Check URL length - FastAdd has ~2000 char limit
+      if (fastAddUrl.length > 2000) {
+        // For long BOMs, use BOM Manager import instead
+        this.digiKeyCartUrl = '';
+        this.bomMessage = `BOM has ${this.bomResults.length} parts. URL too long for FastAdd. Use "Copy All Links" and import to DigiKey BOM Manager.`;
+        this.bomMessageType = 'error';
       } else {
-        throw new Error('No cart URL returned from DigiKey');
+        this.digiKeyCartUrl = fastAddUrl;
+        this.bomMessage = 'DigiKey FastAdd link ready! Click to add parts to cart.';
+        this.bomMessageType = 'success';
       }
     } catch (error) {
       console.error('Error creating DigiKey cart:', error);
-      this.bomMessage = `Failed to create DigiKey cart: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      this.bomMessage = `Failed to create DigiKey link: ${error instanceof Error ? error.message : 'Unknown error'}`;
       this.bomMessageType = 'error';
     } finally {
       this.isCreatingCart = false;
