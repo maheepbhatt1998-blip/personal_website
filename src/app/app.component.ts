@@ -132,6 +132,42 @@ export class AppComponent {
     }
   ];
 
+  // PCB Designs
+  pcbDesigns = [
+    {
+      title: 'GaN Gate Driver Board',
+      description: 'High-frequency gate driver for GaN bidirectional switches with isolated power supply',
+      features: ['4-layer PCB', 'Isolated gate drive', 'High-speed switching']
+    },
+    {
+      title: 'Double Pulse Test Board',
+      description: 'Test fixture for characterizing SiC and GaN power devices',
+      features: ['Low inductance layout', 'Current sensing', 'Voltage probing']
+    },
+    {
+      title: 'CSI Control Board',
+      description: 'Digital control board for current source inverter applications',
+      features: ['DSP-based control', 'PWM generation', 'Protection circuits']
+    },
+    {
+      title: 'DC-DC Converter Board',
+      description: 'High-efficiency front-end converter for CSI systems',
+      features: ['Multi-layer design', 'Thermal management', 'EMI filtering']
+    }
+  ];
+
+  // Tools
+  tools = [
+    { name: 'Altium Designer', category: 'PCB Design', description: 'Multi-layer PCB design and layout' },
+    { name: 'MATLAB/Simulink', category: 'Simulation', description: 'System modeling and control design' },
+    { name: 'PLECS', category: 'Simulation', description: 'Power electronics circuit simulation' },
+    { name: 'LTspice', category: 'Simulation', description: 'SPICE-based circuit analysis' },
+    { name: 'PSIM', category: 'Simulation', description: 'Power converter simulation' },
+    { name: 'Ansys', category: 'Analysis', description: 'Thermal and electromagnetic analysis' },
+    { name: 'Oscilloscope', category: 'Lab Equipment', description: 'Waveform capture and analysis' },
+    { name: 'Power Analyzer', category: 'Lab Equipment', description: 'Efficiency and power measurements' }
+  ];
+
   // Publications
   publications = [
     {

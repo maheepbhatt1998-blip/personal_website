@@ -8,6 +8,8 @@
       <a (click)="scrollToSection('education')">Education</a>
       <a (click)="scrollToSection('skills')">Skills</a>
       <a (click)="scrollToSection('research')">Research</a>
+      <a (click)="scrollToSection('pcb-design')">PCB Design</a>
+      <a (click)="scrollToSection('tools')">Tools</a>
       <a (click)="scrollToSection('publications')">Publications</a>
       <a (click)="scrollToSection('contact')">Contact</a>
     </div>
@@ -235,6 +237,47 @@
           <ul class="research-highlights">
             <li *ngFor="let highlight of project.highlights">{{ highlight }}</li>
           </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PCB Design Section -->
+  <section id="pcb-design" class="section pcb-section">
+    <div class="section-content">
+      <h2 class="section-title">PCB Design</h2>
+      <div class="pcb-grid">
+        <div class="pcb-card" *ngFor="let pcb of pcbDesigns">
+          <div class="pcb-icon">
+            <svg viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="10" y="10" width="30" height="30" rx="2" stroke="currentColor" stroke-width="2"/>
+              <circle cx="18" cy="18" r="3" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="32" cy="18" r="3" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="18" cy="32" r="3" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="32" cy="32" r="3" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M21 18H29M18 21V29M32 21V29M21 32H29" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="25" cy="25" r="2" fill="currentColor"/>
+            </svg>
+          </div>
+          <h3>{{ pcb.title }}</h3>
+          <p class="pcb-description">{{ pcb.description }}</p>
+          <ul class="pcb-features">
+            <li *ngFor="let feature of pcb.features">{{ feature }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools Section -->
+  <section id="tools" class="section tools-section">
+    <div class="section-content">
+      <h2 class="section-title">Tools & Equipment</h2>
+      <div class="tools-grid">
+        <div class="tool-card" *ngFor="let tool of tools">
+          <div class="tool-category">{{ tool.category }}</div>
+          <h3>{{ tool.name }}</h3>
+          <p>{{ tool.description }}</p>
         </div>
       </div>
     </div>
