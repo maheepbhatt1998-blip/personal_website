@@ -1,10 +1,17 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import * as XLSX from 'xlsx';
+
+interface BomResult {
+  partNumber: string;
+  digikeyUrl: string;
+}
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -217,5 +224,139 @@ export class AppComponent {
         element.scrollIntoView({ behavior: 'smooth' });
       }
     }, 300);
+  }
+
+  // BOM Tool properties
+  isDragOver = false;
+  bomColumns: string[] = [];
+  selectedColumn = '';
+  bomData: any[] = [];
+  bomResults: BomResult[] = [];
+  bomMessage = '';
+  bomMessageType: 'error' | 'success' | '' = '';
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = true;
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      this.processFile(files[0]);
+    }
+  }
+
+  onFileSelect(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.processFile(input.files[0]);
+    }
+  }
+
+  processFile(file: File): void {
+    this.bomMessage = '';
+    this.bomMessageType = '';
+    this.bomResults = [];
+    this.bomColumns = [];
+    this.selectedColumn = '';
+
+    const validExtensions = ['.xlsx', '.xls', '.csv'];
+    const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+
+    if (!validExtensions.includes(fileExtension)) {
+      this.bomMessage = 'Please upload a valid Excel file (.xlsx, .xls, .csv)';
+      this.bomMessageType = 'error';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+
+        if (jsonData.length === 0) {
+          this.bomMessage = 'The file appears to be empty';
+          this.bomMessageType = 'error';
+          return;
+        }
+
+        // First row is headers
+        const headers = jsonData[0] as string[];
+        this.bomColumns = headers.filter(h => h && h.toString().trim() !== '');
+
+        // Store remaining data
+        this.bomData = jsonData.slice(1);
+
+        // Auto-detect part number column
+        const partNumberPatterns = ['part number', 'part no', 'partno', 'mpn', 'manufacturer part', 'mfr part', 'p/n', 'pn'];
+        const autoDetectedCol = this.bomColumns.find(col =>
+          partNumberPatterns.some(pattern => col.toLowerCase().includes(pattern))
+        );
+
+        if (autoDetectedCol) {
+          this.selectedColumn = autoDetectedCol;
+          this.processSelectedColumn();
+        }
+
+        this.bomMessage = `File loaded successfully. Found ${this.bomColumns.length} columns and ${this.bomData.length} rows.`;
+        this.bomMessageType = 'success';
+      } catch (error) {
+        this.bomMessage = 'Error reading file. Please ensure it is a valid Excel file.';
+        this.bomMessageType = 'error';
+      }
+    };
+
+    reader.readAsArrayBuffer(file);
+  }
+
+  processSelectedColumn(): void {
+    if (!this.selectedColumn) {
+      this.bomResults = [];
+      return;
+    }
+
+    const colIndex = this.bomColumns.indexOf(this.selectedColumn);
+    if (colIndex === -1) return;
+
+    const partNumbers = this.bomData
+      .map(row => row[colIndex])
+      .filter(val => val && val.toString().trim() !== '')
+      .map(val => val.toString().trim());
+
+    // Remove duplicates
+    const uniquePartNumbers = [...new Set(partNumbers)];
+
+    this.bomResults = uniquePartNumbers.map(pn => ({
+      partNumber: pn,
+      digikeyUrl: `https://www.digikey.com/en/products/result?keywords=${encodeURIComponent(pn)}`
+    }));
+  }
+
+  copyAllLinks(): void {
+    const links = this.bomResults.map(r => `${r.partNumber}\t${r.digikeyUrl}`).join('\n');
+    navigator.clipboard.writeText(links).then(() => {
+      this.bomMessage = 'All links copied to clipboard!';
+      this.bomMessageType = 'success';
+      setTimeout(() => {
+        this.bomMessage = '';
+        this.bomMessageType = '';
+      }, 3000);
+    });
   }
 }

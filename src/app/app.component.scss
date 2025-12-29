@@ -934,9 +934,236 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
   }
 }
 
+// BOM Tool Section
+.bom-tool-section {
+  background: $background-card;
+  position: relative;
+
+  .bom-description {
+    text-align: center;
+    color: $text-secondary;
+    max-width: 600px;
+    margin: 0 auto 40px;
+    font-size: 1.1rem;
+  }
+
+  .bom-upload-area {
+    max-width: 500px;
+    margin: 0 auto 32px;
+    padding: 48px 32px;
+    border: 2px dashed $border-color;
+    border-radius: 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: $background-dark;
+    cursor: pointer;
+
+    &:hover, &.drag-over {
+      border-color: $primary-color;
+      background: rgba($primary-color, 0.05);
+
+      .upload-icon {
+        color: $primary-color;
+        transform: translateY(-4px);
+      }
+    }
+
+    .upload-icon {
+      color: $text-secondary;
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+    }
+
+    p {
+      color: $text-primary;
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+
+    .upload-or {
+      display: block;
+      color: $text-secondary;
+      font-size: 0.875rem;
+      margin-bottom: 12px;
+    }
+
+    .upload-btn {
+      display: inline-block;
+      padding: 12px 28px;
+      background: $gradient-electric;
+      color: $background-dark;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        @include glow-effect($primary-color);
+      }
+    }
+
+    .file-types {
+      display: block;
+      margin-top: 16px;
+      color: $text-secondary;
+      font-size: 0.8rem;
+    }
+  }
+
+  .column-selector {
+    max-width: 400px;
+    margin: 0 auto 32px;
+    text-align: center;
+
+    label {
+      display: block;
+      color: $text-primary;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px 16px;
+      background: $background-dark;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      color: $text-primary;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover, &:focus {
+        border-color: $primary-color;
+        outline: none;
+      }
+
+      option {
+        background: $background-dark;
+        color: $text-primary;
+      }
+    }
+  }
+
+  .bom-results {
+    max-width: 800px;
+    margin: 0 auto;
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 16px;
+
+      h3 {
+        color: $text-primary;
+        font-size: 1.25rem;
+      }
+
+      .btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+      }
+    }
+
+    .results-table {
+      background: $background-dark;
+      border-radius: 12px;
+      border: 1px solid $border-color;
+      overflow: hidden;
+
+      .table-header {
+        display: grid;
+        grid-template-columns: 50px 1fr 180px;
+        padding: 16px 20px;
+        background: rgba($primary-color, 0.1);
+        border-bottom: 1px solid $border-color;
+
+        span {
+          color: $primary-color;
+          font-weight: 600;
+          font-size: 0.875rem;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+      }
+
+      .table-row {
+        display: grid;
+        grid-template-columns: 50px 1fr 180px;
+        padding: 14px 20px;
+        border-bottom: 1px solid $border-color;
+        transition: background 0.3s ease;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &:hover {
+          background: rgba($primary-color, 0.05);
+        }
+
+        .col-num {
+          color: $text-secondary;
+          font-size: 0.875rem;
+        }
+
+        .col-part {
+          color: $text-primary;
+          font-family: 'Consolas', 'Monaco', monospace;
+          font-size: 0.9rem;
+        }
+
+        .col-link a {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          color: $primary-color;
+          text-decoration: none;
+          font-size: 0.875rem;
+          transition: all 0.3s ease;
+
+          &:hover {
+            color: $secondary-color;
+          }
+        }
+      }
+    }
+  }
+
+  .bom-message {
+    max-width: 500px;
+    margin: 24px auto 0;
+    text-align: center;
+
+    p {
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+
+      &.success {
+        background: rgba($secondary-color, 0.15);
+        color: $secondary-color;
+        border: 1px solid rgba($secondary-color, 0.3);
+      }
+
+      &.error {
+        background: rgba($accent-color, 0.15);
+        color: $accent-color;
+        border: 1px solid rgba($accent-color, 0.3);
+      }
+    }
+  }
+}
+
 // Publications Section
 .publications-section {
-  background: $background-card;
+  background: $background-dark;
   position: relative;
 
   &::before {
@@ -1407,6 +1634,32 @@ $gradient-electric: linear-gradient(135deg, #4a9ebb 0%, #5cb88f 100%);
 
       p {
         font-size: 0.8rem;
+      }
+    }
+  }
+
+  // BOM Tool section mobile
+  .bom-tool-section {
+    .bom-upload-area {
+      padding: 32px 20px;
+    }
+
+    .bom-results {
+      .results-table {
+        .table-header,
+        .table-row {
+          grid-template-columns: 40px 1fr 120px;
+          padding: 12px 16px;
+          font-size: 0.8rem;
+        }
+
+        .col-part {
+          word-break: break-all;
+        }
+
+        .col-link a {
+          font-size: 0.75rem;
+        }
       }
     }
   }

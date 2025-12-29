@@ -12,6 +12,7 @@
       <a (click)="scrollToSection('research')">Research</a>
       <a (click)="scrollToSection('pcb-design')">PCB Design</a>
       <a (click)="scrollToSection('tools')">Tools</a>
+      <a (click)="scrollToSection('bom-tool')">BOM Tool</a>
       <a (click)="scrollToSection('publications')">Publications</a>
       <a (click)="scrollToSection('contact')">Contact</a>
     </div>
@@ -46,6 +47,7 @@
       <a (click)="scrollToSectionMobile('research')">Research</a>
       <a (click)="scrollToSectionMobile('pcb-design')">PCB Design</a>
       <a (click)="scrollToSectionMobile('tools')">Tools</a>
+      <a (click)="scrollToSectionMobile('bom-tool')">BOM Tool</a>
       <a (click)="scrollToSectionMobile('publications')">Publications</a>
       <a (click)="scrollToSectionMobile('contact')">Contact</a>
     </div>
@@ -318,6 +320,81 @@
           <h3>{{ tool.name }}</h3>
           <p>{{ tool.description }}</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOM Tool Section -->
+  <section id="bom-tool" class="section bom-tool-section">
+    <div class="section-content">
+      <h2 class="section-title">BOM to DigiKey Tool</h2>
+      <p class="bom-description">Upload your Bill of Materials (Excel file) to generate DigiKey search links for each component.</p>
+
+      <div class="bom-upload-area"
+           [class.drag-over]="isDragOver"
+           (dragover)="onDragOver($event)"
+           (dragleave)="onDragLeave($event)"
+           (drop)="onDrop($event)">
+        <div class="upload-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <p>Drag & drop your Excel file here</p>
+        <span class="upload-or">or</span>
+        <label class="upload-btn">
+          <input type="file" accept=".xlsx,.xls,.csv" (change)="onFileSelect($event)" hidden>
+          Browse Files
+        </label>
+        <span class="file-types">Supported: .xlsx, .xls, .csv</span>
+      </div>
+
+      <div class="column-selector" *ngIf="bomColumns.length > 0">
+        <label>Select Part Number Column:</label>
+        <select [(ngModel)]="selectedColumn" (change)="processSelectedColumn()">
+          <option value="">-- Select Column --</option>
+          <option *ngFor="let col of bomColumns" [value]="col">{{ col }}</option>
+        </select>
+      </div>
+
+      <div class="bom-results" *ngIf="bomResults.length > 0">
+        <div class="results-header">
+          <h3>Found {{ bomResults.length }} Components</h3>
+          <button class="btn btn-secondary" (click)="copyAllLinks()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            Copy All Links
+          </button>
+        </div>
+        <div class="results-table">
+          <div class="table-header">
+            <span class="col-num">#</span>
+            <span class="col-part">Part Number</span>
+            <span class="col-link">DigiKey Link</span>
+          </div>
+          <div class="table-row" *ngFor="let item of bomResults; let i = index">
+            <span class="col-num">{{ i + 1 }}</span>
+            <span class="col-part">{{ item.partNumber }}</span>
+            <span class="col-link">
+              <a [href]="item.digikeyUrl" target="_blank" rel="noopener noreferrer">
+                Search on DigiKey
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/>
+                  <line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+              </a>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bom-message" *ngIf="bomMessage">
+        <p [class.error]="bomMessageType === 'error'" [class.success]="bomMessageType === 'success'">{{ bomMessage }}</p>
       </div>
     </div>
   </section>
