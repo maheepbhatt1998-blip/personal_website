@@ -12,9 +12,7 @@
       <a (click)="scrollToSection('research')">Research</a>
       <a (click)="scrollToSection('pcb-design')">PCB Design</a>
       <a (click)="scrollToSection('tools')">Tools</a>
-      <a (click)="scrollToSection('bom-tool')">BOM Tool</a>
-      <a (click)="scrollToSection('latex-tool')">LaTeX Tool</a>
-      <a (click)="scrollToSection('inverter-demo')">Inverter Demo</a>
+      <a (click)="scrollToSection('design-tools')">Design Tools</a>
       <a (click)="scrollToSection('publications')">Publications</a>
       <a (click)="scrollToSection('contact')">Contact</a>
     </div>
@@ -49,9 +47,7 @@
       <a (click)="scrollToSectionMobile('research')">Research</a>
       <a (click)="scrollToSectionMobile('pcb-design')">PCB Design</a>
       <a (click)="scrollToSectionMobile('tools')">Tools</a>
-      <a (click)="scrollToSectionMobile('bom-tool')">BOM Tool</a>
-      <a (click)="scrollToSectionMobile('latex-tool')">LaTeX Tool</a>
-      <a (click)="scrollToSectionMobile('inverter-demo')">Inverter Demo</a>
+      <a (click)="scrollToSectionMobile('design-tools')">Design Tools</a>
       <a (click)="scrollToSectionMobile('publications')">Publications</a>
       <a (click)="scrollToSectionMobile('contact')">Contact</a>
     </div>
@@ -60,32 +56,346 @@
     </div>
   </div>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <div class="hero-text">
-        <h1>Hi, I'm <span class="highlight">{{ name }}</span></h1>
-        <h2>{{ title }}</h2>
-        <p class="hero-description">{{ aboutMe }}</p>
-        <div class="hero-buttons">
-          <a (click)="scrollToSection('contact')" class="btn btn-primary">Get in Touch</a>
-          <a href="assets/resume.pdf" download="Maheep_Bhatt_Resume.pdf" class="btn btn-secondary">Download CV</a>
+  <!-- Cover Page with Interactive Widgets -->
+  <section class="cover-page" id="cover">
+    <!-- Background Animation -->
+    <div class="cover-bg-animation"></div>
+
+    <!-- Main Content -->
+    <div class="cover-content">
+      <!-- Header -->
+      <div class="cover-header">
+        <div class="profile-photo-container">
+          <img src="assets/profile.jpg" alt="{{ name }}" class="profile-photo" />
+          <div class="photo-ring"></div>
         </div>
-        <div class="social-links">
-          <a [href]="linkedinUrl" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="LinkedIn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-            </svg>
-          </a>
-          <a [href]="instagramUrl" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-            </svg>
-          </a>
+        <h1 class="cover-name">{{ name }}</h1>
+        <p class="cover-title">{{ title }}</p>
+        <p class="cover-affiliation">WEMPEC | University of Wisconsin-Madison</p>
+      </div>
+
+      <!-- Widgets Grid -->
+      <div class="widgets-grid">
+
+        <!-- Row 1: Combined Clocks and Weather -->
+        <div class="widget-row clocks-weather-row">
+          <!-- Combined Clock Widget -->
+          <div class="widget clock-widget combined">
+            <div class="widget-header">
+              <span class="widget-icon">🕐</span>
+              <span class="widget-title">World Clocks</span>
+            </div>
+            <div class="clocks-container">
+              <!-- USA Clock -->
+              <div class="clock-item usa">
+                <div class="clock-location">
+                  <span class="flag">🇺🇸</span>
+                  <span class="location-name">Madison, WI</span>
+                </div>
+                <div class="analog-clock" [class.night]="!isDayTime(usaTime)">
+                  <svg viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="48" class="clock-face"/>
+                    <circle cx="50" cy="50" r="45" class="clock-inner"/>
+                    <!-- Hour markers -->
+                    <g class="hour-markers">
+                      <line *ngFor="let i of [0,1,2,3,4,5,6,7,8,9,10,11]"
+                            x1="50" y1="8" x2="50" y2="12"
+                            [attr.transform]="'rotate(' + (i * 30) + ', 50, 50)'"/>
+                    </g>
+                    <!-- Hour hand -->
+                    <line x1="50" y1="50" x2="50" y2="25" class="hour-hand"
+                          [attr.transform]="'rotate(' + getClockHourRotation(usaTime) + ', 50, 50)'"/>
+                    <!-- Minute hand -->
+                    <line x1="50" y1="50" x2="50" y2="15" class="minute-hand"
+                          [attr.transform]="'rotate(' + getClockMinuteRotation(usaTime) + ', 50, 50)'"/>
+                    <!-- Second hand -->
+                    <line x1="50" y1="55" x2="50" y2="12" class="second-hand"
+                          [attr.transform]="'rotate(' + getClockSecondRotation(usaTime) + ', 50, 50)'"/>
+                    <!-- Center dot -->
+                    <circle cx="50" cy="50" r="3" class="center-dot"/>
+                  </svg>
+                </div>
+                <div class="digital-time">{{ usaTime | date:'HH:mm:ss' }}</div>
+                <div class="time-label">{{ usaTime | date:'EEEE, MMM d' }}</div>
+              </div>
+
+              <!-- India Clock -->
+              <div class="clock-item india">
+                <div class="clock-location">
+                  <span class="flag">🇮🇳</span>
+                  <span class="location-name">India (IST)</span>
+                </div>
+                <div class="analog-clock" [class.night]="!isDayTime(indiaTime)">
+                  <svg viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="48" class="clock-face"/>
+                    <circle cx="50" cy="50" r="45" class="clock-inner"/>
+                    <!-- Hour markers -->
+                    <g class="hour-markers">
+                      <line *ngFor="let i of [0,1,2,3,4,5,6,7,8,9,10,11]"
+                            x1="50" y1="8" x2="50" y2="12"
+                            [attr.transform]="'rotate(' + (i * 30) + ', 50, 50)'"/>
+                    </g>
+                    <!-- Hour hand -->
+                    <line x1="50" y1="50" x2="50" y2="25" class="hour-hand"
+                          [attr.transform]="'rotate(' + getClockHourRotation(indiaTime) + ', 50, 50)'"/>
+                    <!-- Minute hand -->
+                    <line x1="50" y1="50" x2="50" y2="15" class="minute-hand"
+                          [attr.transform]="'rotate(' + getClockMinuteRotation(indiaTime) + ', 50, 50)'"/>
+                    <!-- Second hand -->
+                    <line x1="50" y1="55" x2="50" y2="12" class="second-hand"
+                          [attr.transform]="'rotate(' + getClockSecondRotation(indiaTime) + ', 50, 50)'"/>
+                    <!-- Center dot -->
+                    <circle cx="50" cy="50" r="3" class="center-dot"/>
+                  </svg>
+                </div>
+                <div class="digital-time">{{ indiaTime | date:'HH:mm:ss' }}</div>
+                <div class="time-label">{{ indiaTime | date:'EEEE, MMM d' }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weather Widget (Expanded) -->
+          <div class="widget weather-widget expanded">
+            <div class="widget-header">
+              <span class="widget-icon">{{ getWeatherIcon() }}</span>
+              <span class="widget-title">{{ weather.location }}</span>
+            </div>
+            <div class="weather-main">
+              <div class="weather-temp-group">
+                <span class="weather-temp-primary">{{ weather.tempF }}°F</span>
+                <span class="weather-temp-secondary">{{ tempC }}°C</span>
+              </div>
+              <span class="weather-condition">{{ weather.condition }}</span>
+            </div>
+            <div class="weather-feels-like">
+              Feels like {{ weather.feelsLikeF }}°F / {{ feelsLikeC }}°C
+            </div>
+            <div class="weather-grid">
+              <div class="weather-stat">
+                <span class="stat-icon">💧</span>
+                <span class="stat-label">Humidity</span>
+                <span class="stat-value">{{ weather.humidity }}%</span>
+              </div>
+              <div class="weather-stat">
+                <span class="stat-icon">💨</span>
+                <span class="stat-label">Wind</span>
+                <span class="stat-value">{{ weather.windSpeed }} mph {{ weather.windDirection }}</span>
+              </div>
+              <div class="weather-stat">
+                <span class="stat-icon">🌡️</span>
+                <span class="stat-label">Pressure</span>
+                <span class="stat-value">{{ weather.pressure }} hPa</span>
+              </div>
+              <div class="weather-stat">
+                <span class="stat-icon">👁️</span>
+                <span class="stat-label">Visibility</span>
+                <span class="stat-value">{{ weather.visibility }} mi</span>
+              </div>
+              <div class="weather-stat">
+                <span class="stat-icon">☀️</span>
+                <span class="stat-label">UV Index</span>
+                <span class="stat-value">{{ weather.uvIndex }}</span>
+              </div>
+              <div class="weather-stat">
+                <span class="stat-icon">💦</span>
+                <span class="stat-label">Dew Point</span>
+                <span class="stat-value">{{ weather.dewPoint }}°F / {{ dewPointC }}°C</span>
+              </div>
+              <div class="weather-stat">
+                <span class="stat-icon">☁️</span>
+                <span class="stat-label">Cloud Cover</span>
+                <span class="stat-value">{{ weather.cloudCover }}%</span>
+              </div>
+              <div class="weather-stat">
+                <span class="stat-icon">🌅</span>
+                <span class="stat-label">Sunrise</span>
+                <span class="stat-value">{{ weather.sunrise }}</span>
+              </div>
+              <div class="weather-stat">
+                <span class="stat-icon">🌇</span>
+                <span class="stat-label">Sunset</span>
+                <span class="stat-value">{{ weather.sunset }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Progress Bars and Status -->
+        <div class="widget-row">
+          <!-- Progress Widget -->
+          <div class="widget progress-widget">
+            <div class="widget-header">
+              <span class="widget-icon">📊</span>
+              <span class="widget-title">Progress</span>
+            </div>
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>Today</span>
+                <span>{{ dayProgress | number:'1.1-1' }}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill day" [style.width.%]="dayProgress"></div>
+              </div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>Year 2025</span>
+                <span>{{ yearProgress | number:'1.1-1' }}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill year" [style.width.%]="yearProgress"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Currently Status Widget -->
+          <div class="widget status-widget">
+            <div class="widget-header">
+              <span class="widget-icon">💭</span>
+              <span class="widget-title">Currently</span>
+            </div>
+            <div class="status-items">
+              <div class="status-item">
+                <span class="status-icon">📍</span>
+                <span class="status-text">{{ currentStatus.location }}</span>
+              </div>
+              <div class="status-item">
+                <span class="status-icon">🎯</span>
+                <span class="status-text">{{ currentStatus.workingOn }}</span>
+              </div>
+              <div class="status-item">
+                <span class="status-icon">☕</span>
+                <span class="status-text">{{ currentStatus.coffeeCount }} cups today</span>
+              </div>
+              <div class="status-item">
+                <span class="status-icon">🎵</span>
+                <span class="status-text">{{ currentStatus.listening }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quote Widget -->
+          <div class="widget quote-widget">
+            <div class="widget-header">
+              <span class="widget-icon">💬</span>
+              <span class="widget-title">Quote</span>
+            </div>
+            <div class="quote-content">
+              <p class="quote-text">"{{ currentQuote.text }}"</p>
+              <p class="quote-author">— {{ currentQuote.author }}</p>
+            </div>
+            <div class="quote-controls">
+              <button class="quote-btn" (click)="prevQuote()">←</button>
+              <span class="quote-dots">
+                <span *ngFor="let q of quotes; let i = index"
+                      class="dot" [class.active]="i === currentQuoteIndex"></span>
+              </span>
+              <button class="quote-btn" (click)="nextQuote()">→</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3: Fidgets, GitHub, Theme -->
+        <div class="widget-row">
+          <!-- Fidget Widget -->
+          <div class="widget fidget-widget">
+            <div class="widget-header">
+              <span class="widget-icon">🎮</span>
+              <span class="widget-title">Fidgets</span>
+            </div>
+            <div class="fidgets-container">
+              <!-- Spinner -->
+              <div class="fidget-spinner" (click)="spinFidget()">
+                <svg viewBox="0 0 100 100" [style.transform]="'rotate(' + spinnerRotation + 'deg)'">
+                  <circle cx="50" cy="50" r="8" fill="currentColor"/>
+                  <circle cx="50" cy="20" r="15" fill="currentColor"/>
+                  <circle cx="76" cy="65" r="15" fill="currentColor"/>
+                  <circle cx="24" cy="65" r="15" fill="currentColor"/>
+                  <line x1="50" y1="50" x2="50" y2="20" stroke="currentColor" stroke-width="8"/>
+                  <line x1="50" y1="50" x2="76" y2="65" stroke="currentColor" stroke-width="8"/>
+                  <line x1="50" y1="50" x2="24" y2="65" stroke="currentColor" stroke-width="8"/>
+                </svg>
+                <span class="fidget-label">Click to spin!</span>
+              </div>
+              <!-- Toggles -->
+              <div class="toggle-group">
+                <div class="toggle-switch" (click)="toggleSwitch('toggle1')">
+                  <div class="toggle-track" [class.active]="toggleStates.toggle1">
+                    <div class="toggle-thumb"></div>
+                  </div>
+                </div>
+                <div class="toggle-switch" (click)="toggleSwitch('toggle2')">
+                  <div class="toggle-track" [class.active]="toggleStates.toggle2">
+                    <div class="toggle-thumb"></div>
+                  </div>
+                </div>
+                <div class="toggle-switch" (click)="toggleSwitch('toggle3')">
+                  <div class="toggle-track" [class.active]="toggleStates.toggle3">
+                    <div class="toggle-thumb"></div>
+                  </div>
+                </div>
+              </div>
+              <!-- Slider -->
+              <div class="fidget-slider">
+                <input type="range" min="0" max="100" [(ngModel)]="sliderValue" class="slider-input"/>
+                <span class="slider-value">{{ sliderValue }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- GitHub Widget -->
+          <div class="widget github-widget">
+            <div class="widget-header">
+              <span class="widget-icon">📈</span>
+              <span class="widget-title">Activity</span>
+            </div>
+            <div class="github-grid">
+              <div *ngFor="let week of githubContributions" class="github-week">
+                <div *ngFor="let day of week"
+                     class="github-day"
+                     [style.background]="getContributionColor(day)">
+                </div>
+              </div>
+            </div>
+            <div class="github-legend">
+              <span>Less</span>
+              <div class="legend-squares">
+                <div *ngFor="let i of [0,1,2,3,4]" [style.background]="getContributionColor(i)"></div>
+              </div>
+              <span>More</span>
+            </div>
+          </div>
+
+          <!-- Theme Picker Widget -->
+          <div class="widget theme-widget">
+            <div class="widget-header">
+              <span class="widget-icon">🎨</span>
+              <span class="widget-title">Theme</span>
+            </div>
+            <div class="theme-colors">
+              <button *ngFor="let color of themeColors"
+                      class="theme-color-btn"
+                      [style.background]="color.value"
+                      [class.active]="selectedThemeColor === color.value"
+                      (click)="setThemeColor(color.value)"
+                      [title]="color.name">
+              </button>
+            </div>
+            <div class="theme-preview">
+              <span [style.color]="selectedThemeColor">● Active Color</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="hero-image">
-        <img src="assets/profile.jpg" alt="{{ name }}" class="profile-image" />
+
+      <!-- Scroll Indicator -->
+      <div class="scroll-indicator" (click)="scrollToSection('about')">
+        <span class="scroll-text">Scroll to explore</span>
+        <div class="scroll-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12l7 7 7-7"/>
+          </svg>
+        </div>
       </div>
     </div>
   </section>
@@ -328,11 +638,38 @@
     </div>
   </section>
 
-  <!-- BOM Tool Section -->
-  <section id="bom-tool" class="section bom-tool-section">
+  <!-- Design Tools Section -->
+  <section id="design-tools" class="section design-tools-section">
     <div class="section-content">
-      <h2 class="section-title">BOM to DigiKey Tool</h2>
-      <p class="bom-description">Upload your Bill of Materials (Excel file) to generate DigiKey search links for each component.</p>
+      <h2 class="section-title">Power Electronics Design Tools</h2>
+      <p class="design-tools-description">Interactive calculators and utilities for power electronics design workflow.</p>
+
+      <!-- Tool Selector Dropdown -->
+      <div class="tool-selector">
+        <div class="tool-dropdown">
+          <select [(ngModel)]="selectedDesignTool" (change)="selectDesignTool(selectedDesignTool)">
+            <option *ngFor="let tool of designTools" [value]="tool.id">{{ tool.name }}</option>
+          </select>
+          <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+        <div class="tool-chips">
+          <button *ngFor="let tool of designTools"
+                  class="tool-chip"
+                  [class.active]="selectedDesignTool === tool.id"
+                  (click)="selectDesignTool(tool.id)">
+            {{ tool.name }}
+          </button>
+        </div>
+      </div>
+
+      <!-- BOM Tool Content -->
+      <div class="tool-content" *ngIf="selectedDesignTool === 'bom-tool'">
+        <div class="tool-header">
+          <h3>BOM to DigiKey Tool</h3>
+          <p>Upload your Bill of Materials (Excel file) to generate DigiKey search links for each component.</p>
+        </div>
 
       <div class="bom-upload-area"
            [class.drag-over]="isDragOver"
@@ -457,17 +794,17 @@
       <div class="bom-message" *ngIf="bomMessage">
         <p [class.error]="bomMessageType === 'error'" [class.success]="bomMessageType === 'success'">{{ bomMessage }}</p>
       </div>
-    </div>
-  </section>
+      </div>
 
-  <!-- LaTeX Tool Section -->
-  <section id="latex-tool" class="section latex-tool-section">
-    <div class="section-content">
-      <h2 class="section-title">Word & LaTeX Converter</h2>
-      <p class="latex-description">Convert between Word documents and LaTeX code for academic writing.</p>
+      <!-- LaTeX Tool Content -->
+      <div class="tool-content" *ngIf="selectedDesignTool === 'latex-tool'">
+        <div class="tool-header">
+          <h3>Word & LaTeX Converter</h3>
+          <p>Convert between Word documents and LaTeX code for academic writing.</p>
+        </div>
 
-      <!-- Tab Buttons -->
-      <div class="latex-tabs">
+        <!-- Tab Buttons -->
+        <div class="latex-tabs">
         <button [class.active]="latexActiveTab === 'word-to-latex'" (click)="latexActiveTab = 'word-to-latex'">
           Word to LaTeX
         </button>
@@ -585,16 +922,16 @@ This is a sample document with \textbf{bold} and \textit{italic} text.
           </div>
         </div>
       </div>
-    </div>
-  </section>
+      </div>
 
-  <!-- Inverter Demo Section -->
-  <section id="inverter-demo" class="section inverter-demo-section">
-    <div class="section-content">
-      <h2 class="section-title">VSI vs CSI Interactive Demo</h2>
-      <p class="inverter-description">Explore the fundamental differences between Voltage Source Inverters (VSI) and Current Source Inverters (CSI) in power electronics.</p>
+      <!-- Inverter Demo Content -->
+      <div class="tool-content inverter-demo-content" *ngIf="selectedDesignTool === 'inverter-demo'">
+        <div class="tool-header">
+          <h3>VSI vs CSI Interactive Demo</h3>
+          <p>Explore the fundamental differences between Voltage Source Inverters (VSI) and Current Source Inverters (CSI) in power electronics.</p>
+        </div>
 
-      <div class="inverter-widget">
+        <div class="inverter-widget">
         <!-- Controls -->
         <div class="inverter-controls">
           <div class="inverter-toggle">
@@ -768,110 +1105,266 @@ This is a sample document with \textbf{bold} and \textit{italic} text.
           </div>
         </div>
 
-        <!-- Loss Breakdown Panel -->
-        <div class="loss-breakdown-panel">
-          <h4>Loss Breakdown at {{ switchingFrequency }} kHz</h4>
+        <!-- Loss Breakdown Panel - Creative Design -->
+        <div class="loss-breakdown-panel creative">
+          <h4>Power Loss Analysis at {{ switchingFrequency }} kHz</h4>
 
-          <div class="loss-chart">
-            <!-- Bar Chart -->
-            <div class="loss-bars">
-              <div class="loss-bar-container">
-                <div class="loss-bar switching" [style.height.%]="lossBreakdown.switchingPercent * 0.8">
-                  <span class="bar-value">{{ lossBreakdown.switchingPercent | number:'1.0-0' }}%</span>
-                </div>
-                <span class="bar-label">Switching</span>
-              </div>
-              <div class="loss-bar-container">
-                <div class="loss-bar conduction" [style.height.%]="lossBreakdown.conductionPercent * 0.8">
-                  <span class="bar-value">{{ lossBreakdown.conductionPercent | number:'1.0-0' }}%</span>
-                </div>
-                <span class="bar-label">Conduction</span>
-              </div>
-              <div class="loss-bar-container">
-                <div class="loss-bar passive" [style.height.%]="lossBreakdown.passivePercent * 0.8">
-                  <span class="bar-value">{{ lossBreakdown.passivePercent | number:'1.0-0' }}%</span>
-                </div>
-                <span class="bar-label">{{ inverterType === 'VSI' ? 'Cap ESR' : 'Inductor' }}</span>
+          <!-- Efficiency Gauge and Summary Row -->
+          <div class="efficiency-row">
+            <!-- Animated Efficiency Gauge -->
+            <div class="efficiency-gauge-container">
+              <svg viewBox="0 0 200 130" class="gauge-svg">
+                <!-- Gauge background arc -->
+                <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="#1a1a1a" stroke-width="16" stroke-linecap="round"/>
+                <!-- Colored zones -->
+                <path d="M 20 110 A 80 80 0 0 1 50 45" fill="none" stroke="#ff4444" stroke-width="16" stroke-linecap="round" opacity="0.2"/>
+                <path d="M 50 45 A 80 80 0 0 1 150 45" fill="none" stroke="#ffaa00" stroke-width="16" stroke-linecap="round" opacity="0.2"/>
+                <path d="M 150 45 A 80 80 0 0 1 180 110" fill="none" stroke="#00ff88" stroke-width="16" stroke-linecap="round" opacity="0.2"/>
+                <!-- Active efficiency arc -->
+                <path class="efficiency-arc-animated"
+                      [attr.d]="'M 20 110 A 80 80 0 ' + (getEfficiency() > 85 ? '0' : '0') + ' 1 ' + getGaugeEndpoint().x + ' ' + getGaugeEndpoint().y"
+                      fill="none"
+                      [attr.stroke]="getEfficiencyColor()"
+                      stroke-width="16"
+                      stroke-linecap="round"/>
+                <!-- Needle -->
+                <g class="gauge-needle" [style.transform]="'rotate(' + getGaugeRotation() + 'deg)'" style="transform-origin: 100px 110px;">
+                  <polygon points="100,35 95,110 105,110" [attr.fill]="getEfficiencyColor()"/>
+                  <circle cx="100" cy="110" r="10" fill="#fff"/>
+                  <circle cx="100" cy="110" r="6" [attr.fill]="getEfficiencyColor()"/>
+                </g>
+                <!-- Labels -->
+                <text x="15" y="125" class="gauge-label-text">50%</text>
+                <text x="100" y="20" class="gauge-label-text" text-anchor="middle">Efficiency</text>
+                <text x="185" y="125" class="gauge-label-text">100%</text>
+              </svg>
+              <div class="efficiency-display">
+                <span class="efficiency-value" [style.color]="getEfficiencyColor()">{{ getEfficiency() | number:'1.1-1' }}%</span>
               </div>
             </div>
 
-            <!-- Stacked Bar -->
-            <div class="loss-stacked">
-              <div class="stacked-bar">
-                <div class="segment switching" [style.width.%]="lossBreakdown.switchingPercent"></div>
-                <div class="segment conduction" [style.width.%]="lossBreakdown.conductionPercent"></div>
-                <div class="segment passive" [style.width.%]="lossBreakdown.passivePercent"></div>
+            <!-- Power Summary Cards -->
+            <div class="power-summary-cards">
+              <div class="power-card input">
+                <div class="power-card-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                </div>
+                <div class="power-card-info">
+                  <span class="power-card-label">Input Power</span>
+                  <span class="power-card-value">{{ getInputPower() | number:'1.0-0' }} W</span>
+                </div>
               </div>
-              <div class="stacked-labels">
-                <span>0%</span>
-                <span>Total Loss Distribution</span>
-                <span>100%</span>
+              <div class="power-card loss">
+                <div class="power-card-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                  </svg>
+                </div>
+                <div class="power-card-info">
+                  <span class="power-card-label">Total Loss</span>
+                  <span class="power-card-value loss-value">{{ getTotalLossWatts() }} W</span>
+                </div>
+              </div>
+              <div class="power-card output">
+                <div class="power-card-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                </div>
+                <div class="power-card-info">
+                  <span class="power-card-label">Output Power</span>
+                  <span class="power-card-value output-value">{{ getOutputPower() }} W</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Loss Details -->
-          <div class="loss-details">
-            <div class="loss-item switching-loss">
-              <div class="loss-header">
-                <span class="loss-dot switching"></span>
-                <strong>Switching Loss</strong>
-                <span class="loss-trend">∝ f<sub>sw</sub></span>
-              </div>
-              <p>Energy dissipated during switch turn-on/off transitions. Increases linearly with switching frequency.</p>
-            </div>
-
-            <div class="loss-item conduction-loss">
-              <div class="loss-header">
-                <span class="loss-dot conduction"></span>
-                <strong>Conduction Loss</strong>
-                <span class="loss-trend">≈ constant</span>
-              </div>
-              <p>I²R losses in switches when conducting. Depends on RMS current, relatively independent of frequency.</p>
-            </div>
-
-            <div class="loss-item passive-loss">
-              <div class="loss-header">
-                <span class="loss-dot passive"></span>
-                <strong>{{ lossBreakdown.passiveLabel }}</strong>
-                <span class="loss-trend">{{ inverterType === 'VSI' ? '≈ stable' : '∝ f^1.5' }}</span>
-              </div>
-              <p>{{ lossBreakdown.passiveDescription }}</p>
-            </div>
-          </div>
-
-          <!-- Dynamic Explanation -->
-          <div class="loss-explanation">
-            <div class="explanation-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="16" x2="12" y2="12"/>
-                <line x1="12" y1="8" x2="12.01" y2="8"/>
+          <!-- Animated Donut Chart with Legend -->
+          <div class="donut-section">
+            <div class="donut-chart-container">
+              <svg viewBox="0 0 200 200" class="donut-svg">
+                <defs>
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+                <!-- Background circle -->
+                <circle cx="100" cy="100" r="70" fill="none" stroke="#1a1a1a" stroke-width="30"/>
+                <!-- Switching losses segment -->
+                <circle cx="100" cy="100" r="70" fill="none" stroke="#ff6b6b" stroke-width="30"
+                        [attr.stroke-dasharray]="getDonutDash(lossBreakdown.switchingPercent)"
+                        stroke-dashoffset="0"
+                        transform="rotate(-90, 100, 100)"
+                        class="donut-segment"
+                        filter="url(#glow)"/>
+                <!-- Conduction losses segment -->
+                <circle cx="100" cy="100" r="70" fill="none" stroke="#00d4ff" stroke-width="30"
+                        [attr.stroke-dasharray]="getDonutDash(lossBreakdown.conductionPercent)"
+                        [attr.stroke-dashoffset]="'-' + getDonutOffset(lossBreakdown.switchingPercent)"
+                        transform="rotate(-90, 100, 100)"
+                        class="donut-segment"
+                        filter="url(#glow)"/>
+                <!-- DC-DC Converter losses segment -->
+                <circle cx="100" cy="100" r="70" fill="none" stroke="#ffaa00" stroke-width="30"
+                        [attr.stroke-dasharray]="getDonutDash(lossBreakdown.converterPercent)"
+                        [attr.stroke-dashoffset]="'-' + getDonutOffset(lossBreakdown.switchingPercent + lossBreakdown.conductionPercent)"
+                        transform="rotate(-90, 100, 100)"
+                        class="donut-segment"
+                        filter="url(#glow)"/>
+                <!-- Inner circle for donut effect -->
+                <circle cx="100" cy="100" r="50" fill="#0d1117"/>
+                <!-- Center content -->
+                <text x="100" y="92" text-anchor="middle" class="donut-total-value">{{ getTotalLossWatts() }}W</text>
+                <text x="100" y="112" text-anchor="middle" class="donut-total-label">Total Loss</text>
               </svg>
             </div>
-            <p>{{ lossExplanation }}</p>
+
+            <!-- Interactive Legend (IEEE Paper Formulas) -->
+            <div class="donut-legend">
+              <div class="legend-card switching">
+                <div class="legend-card-header">
+                  <span class="legend-dot"></span>
+                  <span class="legend-title">Bridge Switching Loss</span>
+                  <span class="legend-percent">{{ lossBreakdown.switchingPercent | number:'1.0-0' }}%</span>
+                </div>
+                <div class="legend-card-bar">
+                  <div class="bar-fill" [style.width.%]="lossBreakdown.switchingPercent"></div>
+                </div>
+                <div class="legend-card-detail">
+                  <span class="watts">{{ getSwitchingLossWatts() }}W</span>
+                  <span class="formula" *ngIf="inverterType === 'VSI'">Eq.3: P<sub>sw</sub> = 6f<sub>sw</sub>V<sub>dc</sub>I<sub>pk</sub>(E<sub>on</sub>+E<sub>off</sub>)/πV<sub>ref</sub>I<sub>ref</sub></span>
+                  <span class="formula" *ngIf="inverterType === 'CSI'">Eq.11: P<sub>sw</sub> = 3f<sub>sw</sub>V<sub>line</sub>I<sub>dc</sub>(E<sub>on</sub>+E<sub>off</sub>+E<sub>rr</sub>)/πV<sub>ref</sub>I<sub>ref</sub></span>
+                </div>
+              </div>
+
+              <div class="legend-card conduction">
+                <div class="legend-card-header">
+                  <span class="legend-dot"></span>
+                  <span class="legend-title">{{ inverterType === 'VSI' ? 'IGBT + Diode Conduction' : 'RB-IGBT Conduction' }}</span>
+                  <span class="legend-percent">{{ lossBreakdown.conductionPercent | number:'1.0-0' }}%</span>
+                </div>
+                <div class="legend-card-bar">
+                  <div class="bar-fill" [style.width.%]="lossBreakdown.conductionPercent"></div>
+                </div>
+                <div class="legend-card-detail">
+                  <span class="watts">{{ getConductionLossWatts() }}W</span>
+                  <span class="formula" *ngIf="inverterType === 'VSI'">Eq.4-6: P<sub>cond</sub> = 6(P<sub>igbt</sub> + P<sub>diode</sub>)</span>
+                  <span class="formula" *ngIf="inverterType === 'CSI'">Eq.10: P<sub>cond</sub> = 2I<sub>dc</sub>(V<sub>CE0</sub> + I<sub>dc</sub>r<sub>igbt</sub>)</span>
+                </div>
+              </div>
+
+              <div class="legend-card converter">
+                <div class="legend-card-header">
+                  <span class="legend-dot"></span>
+                  <span class="legend-title">{{ lossBreakdown.converterLabel }}</span>
+                  <span class="legend-percent">{{ lossBreakdown.converterPercent | number:'1.0-0' }}%</span>
+                </div>
+                <div class="legend-card-bar">
+                  <div class="bar-fill" [style.width.%]="lossBreakdown.converterPercent"></div>
+                </div>
+                <div class="legend-card-detail">
+                  <span class="watts">{{ getConverterLossWatts() }}W</span>
+                  <span class="formula" *ngIf="inverterType === 'VSI'">Eq.7-8: P<sub>BBC</sub> = P<sub>sw</sub> + P<sub>cond</sub></span>
+                  <span class="formula" *ngIf="inverterType === 'CSI'">Eq.12-14: P<sub>VIC</sub> = P<sub>sw</sub> + P<sub>cond</sub></span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <!-- Energy Storage Comparison -->
-          <div class="energy-storage-info">
-            <h5>Energy Storage in {{ inverterType }}</h5>
-            <div class="storage-formula" *ngIf="inverterType === 'VSI'">
-              <div class="formula">E = ½CV²</div>
-              <p>The DC-link <strong>capacitor</strong> stores energy in its <em>electric field</em>. It maintains constant voltage across the inverter input, absorbing/supplying instantaneous power differences.</p>
-              <ul>
-                <li>Capacitor ESR causes I²R heating from ripple current</li>
-                <li>ESR typically increases at high frequency (dielectric losses)</li>
-                <li>Ripple current decreases with higher f<sub>sw</sub>, partially compensating</li>
-              </ul>
+          <!-- Thermal Visualization Strip -->
+          <div class="thermal-strip">
+            <div class="thermal-title">Component Thermal Load (based on IEEE paper loss model)</div>
+            <div class="thermal-bars">
+              <div class="thermal-item">
+                <div class="thermal-icon switch-icon">
+                  <svg viewBox="0 0 40 40">
+                    <rect x="5" y="10" width="30" height="20" rx="2" fill="currentColor"/>
+                    <rect x="12" y="2" width="4" height="10" fill="currentColor" opacity="0.6"/>
+                    <rect x="24" y="2" width="4" height="10" fill="currentColor" opacity="0.6"/>
+                    <rect x="10" y="30" width="20" height="6" rx="1" fill="currentColor" opacity="0.4"/>
+                  </svg>
+                </div>
+                <div class="thermal-bar-wrapper">
+                  <div class="thermal-bar"
+                       [style.width.%]="Math.min(100, (getSwitchingLossWatts() + getConductionLossWatts()) / 20)"
+                       [style.background]="'linear-gradient(90deg, #ff6b6b, #ffaa00)'">
+                  </div>
+                </div>
+                <span class="thermal-label">{{ inverterType === 'VSI' ? 'IGBT Module' : 'RB-IGBT' }}</span>
+                <span class="thermal-temp" [style.color]="getTempColor(getSwitchingLossWatts() + getConductionLossWatts())">
+                  {{ getComponentTemp(getSwitchingLossWatts() + getConductionLossWatts(), 0.3) }}°C
+                </span>
+              </div>
+
+              <div class="thermal-item">
+                <div class="thermal-icon converter-icon">
+                  <svg viewBox="0 0 40 40">
+                    <rect x="5" y="12" width="14" height="16" rx="2" fill="currentColor"/>
+                    <rect x="21" y="12" width="14" height="16" rx="2" fill="currentColor"/>
+                    <path d="M 12 20 L 28 20" stroke="currentColor" stroke-width="2"/>
+                    <polygon points="26,17 30,20 26,23" fill="currentColor"/>
+                  </svg>
+                </div>
+                <div class="thermal-bar-wrapper">
+                  <div class="thermal-bar"
+                       [style.width.%]="Math.min(100, getConverterLossWatts() / 20)"
+                       style="background: linear-gradient(90deg, #ffaa00, #ff6b6b)">
+                  </div>
+                </div>
+                <span class="thermal-label">{{ inverterType === 'VSI' ? 'BBC' : 'V-I Conv.' }}</span>
+                <span class="thermal-temp" [style.color]="getTempColor(getConverterLossWatts())">
+                  {{ getComponentTemp(getConverterLossWatts(), 0.4) }}°C
+                </span>
+              </div>
             </div>
-            <div class="storage-formula" *ngIf="inverterType === 'CSI'">
-              <div class="formula">E = ½LI²</div>
-              <p>The DC-link <strong>inductor</strong> stores energy in its <em>magnetic field</em>. It maintains constant current into the inverter, acting as a current buffer.</p>
-              <ul>
-                <li>Core loss follows Steinmetz equation: P<sub>core</sub> ∝ f<sup>α</sup>B<sup>β</sup></li>
-                <li>Copper loss from AC ripple current (skin/proximity effects)</li>
-                <li>Core loss dominates at high frequency, requiring advanced materials</li>
-              </ul>
+          </div>
+
+          <!-- Key Insight Box -->
+          <div class="insight-box">
+            <div class="insight-icon-wrapper">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4M12 8h.01"/>
+              </svg>
+            </div>
+            <div class="insight-text">
+              <span class="insight-label">Key Insight</span>
+              <p>{{ lossExplanation }}</p>
+            </div>
+          </div>
+
+          <!-- IEEE Paper Reference Card -->
+          <div class="energy-storage-card" [class.vsi]="inverterType === 'VSI'" [class.csi]="inverterType === 'CSI'">
+            <div class="storage-header">
+              <div class="storage-icon">
+                <svg viewBox="0 0 40 40" *ngIf="inverterType === 'VSI'">
+                  <rect x="8" y="5" width="24" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <line x1="14" y1="14" x2="14" y2="26" stroke="currentColor" stroke-width="3"/>
+                  <line x1="26" y1="14" x2="26" y2="26" stroke="currentColor" stroke-width="3"/>
+                  <path d="M 20 8 L 20 4 M 16 4 L 24 4" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <svg viewBox="0 0 40 40" *ngIf="inverterType === 'CSI'">
+                  <ellipse cx="20" cy="20" rx="16" ry="12" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <path d="M 6 20 Q 11 10 16 20 Q 21 30 26 20 Q 31 10 34 20" fill="none" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </div>
+              <div class="storage-title">
+                <span class="title-main">{{ inverterType === 'VSI' ? 'VSI + Boost/Buck Converter' : 'CSI + V-I Converter' }}</span>
+                <span class="title-formula">IEEE Paper: Su & Ning, ITEC 2013</span>
+              </div>
+            </div>
+            <div class="storage-description" *ngIf="inverterType === 'VSI'">
+              <strong>VSI topology:</strong> 6 IGBTs with antiparallel diodes + DC-link capacitor (~1000μF). Requires boost converter to raise battery voltage (200V→450V). Switching loss: 6·f<sub>sw</sub>·V<sub>dc</sub>·I<sub>peak</sub>·(E<sub>on</sub>+E<sub>off</sub>+E<sub>rr</sub>)/π.
+            </div>
+            <div class="storage-description" *ngIf="inverterType === 'CSI'">
+              <strong>CSI topology:</strong> 6 RB-IGBTs (no antiparallel diodes) + DC-link inductor. V-I converter provides voltage-to-current conversion. At high speeds, V-I converter stays ON → <em>no switching loss</em>, achieving <strong>18.8% energy savings</strong> per paper results.
             </div>
           </div>
         </div>
@@ -983,7 +1476,322 @@ This is a sample document with \textbf{bold} and \textit{italic} text.
             </table>
           </div>
         </div>
+        </div>
       </div>
+
+      <!-- Magnetics Design Tool Content -->
+      <div class="tool-content magnetics-tool-content" *ngIf="selectedDesignTool === 'magnetics-tool'">
+        <div class="tool-header">
+          <h3>Magnetics Design Tool</h3>
+          <p>Calculate inductor parameters for DC-DC converter designs including core selection, turns, and wire gauge.</p>
+        </div>
+
+        <div class="magnetics-calculator">
+          <div class="calc-inputs">
+            <h4>Input Parameters</h4>
+            <div class="input-grid">
+              <div class="input-group">
+                <label>Topology</label>
+                <select [(ngModel)]="magneticsInputs.topology">
+                  <option value="buck">Buck Converter</option>
+                  <option value="boost">Boost Converter</option>
+                  <option value="buck-boost">Buck-Boost Converter</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label>Power (W)</label>
+                <input type="number" [(ngModel)]="magneticsInputs.power" min="1" max="10000">
+              </div>
+              <div class="input-group">
+                <label>Input Voltage (V)</label>
+                <input type="number" [(ngModel)]="magneticsInputs.inputVoltage" min="1" max="1000">
+              </div>
+              <div class="input-group">
+                <label>Output Voltage (V)</label>
+                <input type="number" [(ngModel)]="magneticsInputs.outputVoltage" min="1" max="1000">
+              </div>
+              <div class="input-group">
+                <label>Switching Frequency (kHz)</label>
+                <input type="number" [(ngModel)]="magneticsInputs.frequency" min="10" max="1000">
+              </div>
+              <div class="input-group">
+                <label>Ripple Current (%)</label>
+                <input type="number" [(ngModel)]="magneticsInputs.rippleCurrent" min="5" max="50">
+              </div>
+              <div class="input-group">
+                <label>Duty Cycle (%)</label>
+                <input type="number" [(ngModel)]="magneticsInputs.dutyCycle" min="5" max="95">
+              </div>
+            </div>
+            <button class="btn btn-primary calc-btn" (click)="calculateMagnetics()">
+              Calculate Inductor
+            </button>
+          </div>
+
+          <div class="calc-results" *ngIf="magneticsResults">
+            <h4>Design Results</h4>
+            <div class="results-grid">
+              <div class="result-card primary">
+                <span class="result-label">Inductance</span>
+                <span class="result-value">{{ magneticsResults.inductance | number:'1.2-2' }} µH</span>
+              </div>
+              <div class="result-card">
+                <span class="result-label">Peak Current</span>
+                <span class="result-value">{{ magneticsResults.peakCurrent | number:'1.2-2' }} A</span>
+              </div>
+              <div class="result-card">
+                <span class="result-label">RMS Current</span>
+                <span class="result-value">{{ magneticsResults.rmsCurrent | number:'1.2-2' }} A</span>
+              </div>
+              <div class="result-card">
+                <span class="result-label">Energy Stored</span>
+                <span class="result-value">{{ magneticsResults.energyStored | number:'1.2-2' }} µJ</span>
+              </div>
+            </div>
+
+            <h4>Core & Winding</h4>
+            <div class="results-grid">
+              <div class="result-card highlight">
+                <span class="result-label">Recommended Core</span>
+                <span class="result-value">{{ magneticsResults.coreSize }}</span>
+              </div>
+              <div class="result-card">
+                <span class="result-label">Number of Turns</span>
+                <span class="result-value">{{ magneticsResults.turns }}</span>
+              </div>
+              <div class="result-card">
+                <span class="result-label">Wire Gauge</span>
+                <span class="result-value">{{ magneticsResults.wireGauge }}</span>
+              </div>
+              <div class="result-card">
+                <span class="result-label">Air Gap</span>
+                <span class="result-value">{{ magneticsResults.airGap | number:'1.2-2' }} mm</span>
+              </div>
+            </div>
+
+            <h4>Loss Estimation</h4>
+            <div class="results-grid">
+              <div class="result-card">
+                <span class="result-label">Core Loss</span>
+                <span class="result-value">{{ magneticsResults.coreLoss | number:'1.2-2' }} W</span>
+              </div>
+              <div class="result-card">
+                <span class="result-label">Copper Loss</span>
+                <span class="result-value">{{ magneticsResults.copperLoss | number:'1.2-2' }} W</span>
+              </div>
+              <div class="result-card warning">
+                <span class="result-label">Total Loss</span>
+                <span class="result-value">{{ magneticsResults.totalLoss | number:'1.2-2' }} W</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Heatsink Calculator Content -->
+      <div class="tool-content heatsink-tool-content" *ngIf="selectedDesignTool === 'heatsink-tool'">
+        <div class="tool-header">
+          <h3>Heatsink/Thermal Calculator</h3>
+          <p>Calculate required heatsink thermal resistance and get recommendations based on power dissipation.</p>
+        </div>
+
+        <div class="heatsink-calculator">
+          <div class="calc-inputs">
+            <h4>Thermal Parameters</h4>
+            <div class="input-grid">
+              <div class="input-group">
+                <label>Power Dissipation (W)</label>
+                <input type="number" [(ngModel)]="heatsinkInputs.powerLoss" min="0.1" max="1000">
+              </div>
+              <div class="input-group">
+                <label>Ambient Temperature (°C)</label>
+                <input type="number" [(ngModel)]="heatsinkInputs.ambientTemp" min="-40" max="85">
+              </div>
+              <div class="input-group">
+                <label>Max Junction Temp (°C)</label>
+                <input type="number" [(ngModel)]="heatsinkInputs.maxJunctionTemp" min="50" max="175">
+              </div>
+              <div class="input-group">
+                <label>R_θJC (°C/W)</label>
+                <input type="number" [(ngModel)]="heatsinkInputs.thermalResJC" min="0.01" max="10" step="0.01">
+              </div>
+              <div class="input-group">
+                <label>R_θCS (°C/W)</label>
+                <input type="number" [(ngModel)]="heatsinkInputs.thermalResCS" min="0.01" max="5" step="0.01">
+              </div>
+              <div class="input-group">
+                <label>Cooling Method</label>
+                <select [(ngModel)]="heatsinkInputs.coolingMethod">
+                  <option value="natural">Natural Convection</option>
+                  <option value="forced-low">Forced Air (Low)</option>
+                  <option value="forced-high">Forced Air (High)</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary calc-btn" (click)="calculateHeatsink()">
+              Calculate Heatsink
+            </button>
+          </div>
+
+          <div class="calc-results" *ngIf="heatsinkResults">
+            <h4>Thermal Analysis</h4>
+            <div class="thermal-diagram">
+              <div class="thermal-node junction">
+                <span class="node-label">Junction</span>
+                <span class="node-temp">T_j = {{ heatsinkInputs.maxJunctionTemp }}°C max</span>
+              </div>
+              <div class="thermal-resistance">R_θJC = {{ heatsinkInputs.thermalResJC }} °C/W</div>
+              <div class="thermal-node case">
+                <span class="node-label">Case</span>
+                <span class="node-temp">T_c = {{ heatsinkResults.maxTcase | number:'1.1-1' }}°C</span>
+              </div>
+              <div class="thermal-resistance">R_θCS = {{ heatsinkInputs.thermalResCS }} °C/W</div>
+              <div class="thermal-node sink">
+                <span class="node-label">Heatsink</span>
+                <span class="node-temp">T_s = {{ heatsinkResults.maxTsink | number:'1.1-1' }}°C</span>
+              </div>
+              <div class="thermal-resistance required">R_θSA = {{ heatsinkResults.requiredRthSA | number:'1.2-2' }} °C/W</div>
+              <div class="thermal-node ambient">
+                <span class="node-label">Ambient</span>
+                <span class="node-temp">T_a = {{ heatsinkInputs.ambientTemp }}°C</span>
+              </div>
+            </div>
+
+            <div class="results-grid">
+              <div class="result-card primary">
+                <span class="result-label">Required R_θSA</span>
+                <span class="result-value">{{ heatsinkResults.requiredRthSA | number:'1.2-2' }} °C/W</span>
+              </div>
+              <div class="result-card" [class.warning]="heatsinkResults.temperatureMargin < 10">
+                <span class="result-label">Temperature Margin</span>
+                <span class="result-value">{{ heatsinkResults.temperatureMargin | number:'1.1-1' }}°C</span>
+              </div>
+              <div class="result-card" *ngIf="heatsinkInputs.coolingMethod !== 'natural'">
+                <span class="result-label">Airflow Required</span>
+                <span class="result-value">{{ heatsinkResults.airflowRequired | number:'1.2-2' }} CFM</span>
+              </div>
+            </div>
+
+            <h4>Suggested Heatsinks</h4>
+            <div class="heatsink-suggestions">
+              <div class="heatsink-card" *ngFor="let hs of heatsinkResults.suggestedHeatsinks">
+                <span class="hs-name">{{ hs.name }}</span>
+                <span class="hs-rth">R_θSA: {{ hs.rth }} °C/W</span>
+                <span class="hs-size">{{ hs.size }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Snubber Design Calculator Content -->
+      <div class="tool-content snubber-tool-content" *ngIf="selectedDesignTool === 'snubber-tool'">
+        <div class="tool-header">
+          <h3>Snubber Design Calculator</h3>
+          <p>Design RC, RCD, or TVS clamp snubbers to suppress voltage spikes and ringing in power switches.</p>
+        </div>
+
+        <div class="snubber-calculator">
+          <div class="calc-inputs">
+            <h4>Circuit Parameters</h4>
+            <div class="input-grid">
+              <div class="input-group">
+                <label>DC Bus Voltage (V)</label>
+                <input type="number" [(ngModel)]="snubberInputs.voltage" min="10" max="1500">
+              </div>
+              <div class="input-group">
+                <label>Load Current (A)</label>
+                <input type="number" [(ngModel)]="snubberInputs.current" min="0.1" max="500">
+              </div>
+              <div class="input-group">
+                <label>Device C_oss (pF)</label>
+                <input type="number" [(ngModel)]="snubberInputs.deviceCoss" min="1" max="10000">
+              </div>
+              <div class="input-group">
+                <label>Stray Inductance (nH)</label>
+                <input type="number" [(ngModel)]="snubberInputs.strayInductance" min="1" max="1000">
+              </div>
+              <div class="input-group">
+                <label>Switching Freq (kHz)</label>
+                <input type="number" [(ngModel)]="snubberInputs.switchingFreq" min="1" max="1000">
+              </div>
+              <div class="input-group">
+                <label>Snubber Type</label>
+                <select [(ngModel)]="snubberInputs.snubberType">
+                  <option value="rc">RC Snubber</option>
+                  <option value="rcd">RCD Snubber</option>
+                  <option value="clamp">TVS/Clamp</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary calc-btn" (click)="calculateSnubber()">
+              Design Snubber
+            </button>
+          </div>
+
+          <div class="calc-results" *ngIf="snubberResults">
+            <h4>Voltage Stress Analysis</h4>
+            <div class="voltage-comparison">
+              <div class="voltage-bar without">
+                <div class="bar-fill" [style.width.%]="100"></div>
+                <span class="bar-label">Without Snubber</span>
+                <span class="bar-value">{{ snubberResults.peakVoltageWithout | number:'1.0-0' }} V</span>
+              </div>
+              <div class="voltage-bar with">
+                <div class="bar-fill" [style.width.%]="(snubberResults.peakVoltageWith / snubberResults.peakVoltageWithout) * 100"></div>
+                <span class="bar-label">With Snubber</span>
+                <span class="bar-value">{{ snubberResults.peakVoltageWith | number:'1.0-0' }} V</span>
+              </div>
+              <div class="voltage-bar bus">
+                <div class="bar-fill" [style.width.%]="(snubberInputs.voltage / snubberResults.peakVoltageWithout) * 100"></div>
+                <span class="bar-label">DC Bus</span>
+                <span class="bar-value">{{ snubberInputs.voltage }} V</span>
+              </div>
+            </div>
+
+            <h4>Snubber Components</h4>
+            <div class="results-grid">
+              <div class="result-card primary" *ngIf="snubberResults.snubberC > 0">
+                <span class="result-label">Snubber Capacitor</span>
+                <span class="result-value">{{ snubberResults.snubberC | number:'1.2-2' }} nF</span>
+              </div>
+              <div class="result-card" *ngIf="snubberResults.snubberR > 0">
+                <span class="result-label">Snubber Resistor</span>
+                <span class="result-value">{{ snubberResults.snubberR | number:'1.1-1' }} Ω</span>
+              </div>
+              <div class="result-card" *ngIf="snubberResults.snubberD !== 'N/A'">
+                <span class="result-label">Diode/TVS</span>
+                <span class="result-value small">{{ snubberResults.snubberD }}</span>
+              </div>
+              <div class="result-card warning">
+                <span class="result-label">Power Loss</span>
+                <span class="result-value">{{ snubberResults.snubberPowerLoss | number:'1.2-2' }} W</span>
+              </div>
+            </div>
+
+            <h4>Analysis</h4>
+            <div class="results-grid">
+              <div class="result-card">
+                <span class="result-label">Resonant Frequency</span>
+                <span class="result-value">{{ snubberResults.resonantFreq | number:'1.2-2' }} MHz</span>
+              </div>
+              <div class="result-card">
+                <span class="result-label">Damping Factor</span>
+                <span class="result-value">{{ snubberResults.dampingFactor | number:'1.2-2' }}</span>
+              </div>
+              <div class="result-card" *ngIf="snubberResults.clampVoltage > 0">
+                <span class="result-label">Clamp Voltage</span>
+                <span class="result-value">{{ snubberResults.clampVoltage | number:'1.0-0' }} V</span>
+              </div>
+            </div>
+
+            <div class="recommendation-box">
+              <p>{{ snubberResults.recommendation }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 

@@ -1,4 +1,9 @@
 /* Global Styles - Dark Tech Theme */
+:root {
+  --accent-color: #00d4ff;
+  --accent-color-rgb: 0, 212, 255;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
