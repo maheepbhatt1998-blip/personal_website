@@ -1,19 +1,26 @@
 <div class="website-container">
   <!-- Navigation -->
   <nav class="navbar">
-    <div class="nav-brand">{{ name }}</div>
+    <div class="nav-brand" (click)="navigateTo('home')" style="cursor: pointer;" aria-label="Maheep Bhatt — home">
+      <svg class="brand-logo" viewBox="0 0 44 44" role="img" aria-label="MB">
+        <defs>
+          <linearGradient id="mbGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff3d6a"/>
+            <stop offset="100%" stop-color="#B8926A"/>
+          </linearGradient>
+        </defs>
+        <rect x="2" y="2" width="40" height="40" rx="12" fill="url(#mbGrad)"/>
+        <text x="22" y="29.5" text-anchor="middle" fill="#ffffff"
+              font-family="'Space Grotesk', sans-serif" font-size="19" font-weight="700" letter-spacing="0.5">MB</text>
+      </svg>
+    </div>
 
     <!-- Desktop Navigation -->
     <div class="nav-links desktop-nav">
-      <a (click)="scrollToSection('about')">About</a>
-      <a (click)="scrollToSection('experience')">Experience</a>
-      <a (click)="scrollToSection('education')">Education</a>
-      <a (click)="scrollToSection('skills')">Skills</a>
-      <a (click)="scrollToSection('research')">Research</a>
-      <a (click)="scrollToSection('pcb-design')">PCB Design</a>
-      <a (click)="scrollToSection('tools')">Tools</a>
-      <a (click)="scrollToSection('design-tools')">Design Tools</a>
-      <a (click)="scrollToSection('publications')">Publications</a>
+      <a (click)="navigateTo('about')" [class.active]="currentPage === 'about'">About Me</a>
+      <a (click)="navigateTo('research')" [class.active]="currentPage === 'research'">Research</a>
+      <a (click)="navigateTo('design-tools')" [class.active]="currentPage === 'design-tools'">Design Tools</a>
+      <a (click)="navigateTo('blog')" [class.active]="currentPage === 'blog'">Blog</a>
       <a (click)="scrollToSection('contact')">Contact</a>
     </div>
 
@@ -31,7 +38,19 @@
   <!-- Mobile Navigation Drawer -->
   <div class="mobile-nav" [class.active]="mobileMenuOpen">
     <div class="mobile-nav-header">
-      <span class="mobile-nav-brand">{{ name }}</span>
+      <span class="mobile-nav-brand">
+        <svg class="brand-logo" viewBox="0 0 44 44" role="img" aria-label="MB">
+          <defs>
+            <linearGradient id="mbGradM" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ff3d6a"/>
+              <stop offset="100%" stop-color="#B8926A"/>
+            </linearGradient>
+          </defs>
+          <rect x="2" y="2" width="40" height="40" rx="12" fill="url(#mbGradM)"/>
+          <text x="22" y="29.5" text-anchor="middle" fill="#ffffff"
+                font-family="'Space Grotesk', sans-serif" font-size="19" font-weight="700" letter-spacing="0.5">MB</text>
+        </svg>
+      </span>
       <button class="close-btn" (click)="toggleMobileMenu()" aria-label="Close menu">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -40,15 +59,11 @@
       </button>
     </div>
     <div class="mobile-nav-links">
-      <a (click)="scrollToSectionMobile('about')">About</a>
-      <a (click)="scrollToSectionMobile('experience')">Experience</a>
-      <a (click)="scrollToSectionMobile('education')">Education</a>
-      <a (click)="scrollToSectionMobile('skills')">Skills</a>
-      <a (click)="scrollToSectionMobile('research')">Research</a>
-      <a (click)="scrollToSectionMobile('pcb-design')">PCB Design</a>
-      <a (click)="scrollToSectionMobile('tools')">Tools</a>
-      <a (click)="scrollToSectionMobile('design-tools')">Design Tools</a>
-      <a (click)="scrollToSectionMobile('publications')">Publications</a>
+      <a (click)="navigateTo('home'); toggleMobileMenu()">Home</a>
+      <a (click)="navigateTo('about'); toggleMobileMenu()">About Me</a>
+      <a (click)="navigateTo('research'); toggleMobileMenu()">Research</a>
+      <a (click)="navigateTo('design-tools'); toggleMobileMenu()">Design Tools</a>
+      <a (click)="navigateTo('blog'); toggleMobileMenu()">Blog</a>
       <a (click)="scrollToSectionMobile('contact')">Contact</a>
     </div>
     <div class="mobile-nav-footer">
@@ -56,352 +71,132 @@
     </div>
   </div>
 
-  <!-- Cover Page with Interactive Widgets -->
-  <section class="cover-page" id="cover">
-    <!-- Background Animation -->
-    <div class="cover-bg-animation"></div>
-
-    <!-- Main Content -->
-    <div class="cover-content">
-      <!-- Header -->
-      <div class="cover-header">
-        <div class="profile-photo-container">
-          <img src="assets/profile.jpg" alt="{{ name }}" class="profile-photo" />
-          <div class="photo-ring"></div>
+  <!-- ==================== HOME PAGE ==================== -->
+  <ng-container *ngIf="currentPage === 'home'">
+    <!-- Hero Section -->
+    <section class="cover-page" id="cover">
+      <div class="cover-content">
+        <div class="cover-header">
+          <div class="profile-photo-container">
+            <img src="assets/profile.jpg" alt="{{ name }}" class="profile-photo" />
+          </div>
+          <h1 class="cover-name">{{ name }}</h1>
+          <p class="cover-title">{{ title }}</p>
+          <p class="cover-affiliation">WEMPEC | University of Wisconsin-Madison</p>
         </div>
-        <h1 class="cover-name">{{ name }}</h1>
-        <p class="cover-title">{{ title }}</p>
-        <p class="cover-affiliation">WEMPEC | University of Wisconsin-Madison</p>
-      </div>
 
-      <!-- Widgets Grid -->
-      <div class="widgets-grid">
-
-        <!-- Row 1: Combined Clocks and Weather -->
-        <div class="widget-row clocks-weather-row">
-          <!-- Combined Clock Widget -->
-          <div class="widget clock-widget combined">
-            <div class="widget-header">
-              <span class="widget-icon">🕐</span>
-              <span class="widget-title">World Clocks</span>
+        <!-- Navigation Cards -->
+        <div class="nav-cards">
+          <div class="nav-card" (click)="navigateTo('about')">
+            <div class="nav-card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
             </div>
-            <div class="clocks-container">
-              <!-- USA Clock -->
-              <div class="clock-item usa">
-                <div class="clock-location">
-                  <span class="flag">🇺🇸</span>
-                  <span class="location-name">Madison, WI</span>
-                </div>
-                <div class="analog-clock" [class.night]="!isDayTime(usaTime)">
-                  <svg viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="48" class="clock-face"/>
-                    <circle cx="50" cy="50" r="45" class="clock-inner"/>
-                    <!-- Hour markers -->
-                    <g class="hour-markers">
-                      <line *ngFor="let i of [0,1,2,3,4,5,6,7,8,9,10,11]"
-                            x1="50" y1="8" x2="50" y2="12"
-                            [attr.transform]="'rotate(' + (i * 30) + ', 50, 50)'"/>
-                    </g>
-                    <!-- Hour hand -->
-                    <line x1="50" y1="50" x2="50" y2="25" class="hour-hand"
-                          [attr.transform]="'rotate(' + getClockHourRotation(usaTime) + ', 50, 50)'"/>
-                    <!-- Minute hand -->
-                    <line x1="50" y1="50" x2="50" y2="15" class="minute-hand"
-                          [attr.transform]="'rotate(' + getClockMinuteRotation(usaTime) + ', 50, 50)'"/>
-                    <!-- Second hand -->
-                    <line x1="50" y1="55" x2="50" y2="12" class="second-hand"
-                          [attr.transform]="'rotate(' + getClockSecondRotation(usaTime) + ', 50, 50)'"/>
-                    <!-- Center dot -->
-                    <circle cx="50" cy="50" r="3" class="center-dot"/>
-                  </svg>
-                </div>
-                <div class="digital-time">{{ usaTime | date:'HH:mm:ss' }}</div>
-                <div class="time-label">{{ usaTime | date:'EEEE, MMM d' }}</div>
-              </div>
-
-              <!-- India Clock -->
-              <div class="clock-item india">
-                <div class="clock-location">
-                  <span class="flag">🇮🇳</span>
-                  <span class="location-name">India (IST)</span>
-                </div>
-                <div class="analog-clock" [class.night]="!isDayTime(indiaTime)">
-                  <svg viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="48" class="clock-face"/>
-                    <circle cx="50" cy="50" r="45" class="clock-inner"/>
-                    <!-- Hour markers -->
-                    <g class="hour-markers">
-                      <line *ngFor="let i of [0,1,2,3,4,5,6,7,8,9,10,11]"
-                            x1="50" y1="8" x2="50" y2="12"
-                            [attr.transform]="'rotate(' + (i * 30) + ', 50, 50)'"/>
-                    </g>
-                    <!-- Hour hand -->
-                    <line x1="50" y1="50" x2="50" y2="25" class="hour-hand"
-                          [attr.transform]="'rotate(' + getClockHourRotation(indiaTime) + ', 50, 50)'"/>
-                    <!-- Minute hand -->
-                    <line x1="50" y1="50" x2="50" y2="15" class="minute-hand"
-                          [attr.transform]="'rotate(' + getClockMinuteRotation(indiaTime) + ', 50, 50)'"/>
-                    <!-- Second hand -->
-                    <line x1="50" y1="55" x2="50" y2="12" class="second-hand"
-                          [attr.transform]="'rotate(' + getClockSecondRotation(indiaTime) + ', 50, 50)'"/>
-                    <!-- Center dot -->
-                    <circle cx="50" cy="50" r="3" class="center-dot"/>
-                  </svg>
-                </div>
-                <div class="digital-time">{{ indiaTime | date:'HH:mm:ss' }}</div>
-                <div class="time-label">{{ indiaTime | date:'EEEE, MMM d' }}</div>
-              </div>
-            </div>
+            <h3 class="nav-card-title">About Me</h3>
+            <p class="nav-card-desc">Experience, education, skills, and publications</p>
+            <span class="nav-card-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </span>
           </div>
 
-          <!-- Weather Widget (Expanded) -->
-          <div class="widget weather-widget expanded">
-            <div class="widget-header">
-              <span class="widget-icon">{{ getWeatherIcon() }}</span>
-              <span class="widget-title">{{ weather.location }}</span>
+          <div class="nav-card" (click)="navigateTo('research')">
+            <div class="nav-card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/>
+              </svg>
             </div>
-            <div class="weather-main">
-              <div class="weather-temp-group">
-                <span class="weather-temp-primary">{{ weather.tempF }}°F</span>
-                <span class="weather-temp-secondary">{{ tempC }}°C</span>
-              </div>
-              <span class="weather-condition">{{ weather.condition }}</span>
+            <h3 class="nav-card-title">Research</h3>
+            <p class="nav-card-desc">Projects, PCB designs, and lab equipment</p>
+            <span class="nav-card-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </span>
+          </div>
+
+          <div class="nav-card" (click)="navigateTo('design-tools')">
+            <div class="nav-card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+              </svg>
             </div>
-            <div class="weather-feels-like">
-              Feels like {{ weather.feelsLikeF }}°F / {{ feelsLikeC }}°C
-            </div>
-            <div class="weather-grid">
-              <div class="weather-stat">
-                <span class="stat-icon">💧</span>
-                <span class="stat-label">Humidity</span>
-                <span class="stat-value">{{ weather.humidity }}%</span>
-              </div>
-              <div class="weather-stat">
-                <span class="stat-icon">💨</span>
-                <span class="stat-label">Wind</span>
-                <span class="stat-value">{{ weather.windSpeed }} mph {{ weather.windDirection }}</span>
-              </div>
-              <div class="weather-stat">
-                <span class="stat-icon">🌡️</span>
-                <span class="stat-label">Pressure</span>
-                <span class="stat-value">{{ weather.pressure }} hPa</span>
-              </div>
-              <div class="weather-stat">
-                <span class="stat-icon">👁️</span>
-                <span class="stat-label">Visibility</span>
-                <span class="stat-value">{{ weather.visibility }} mi</span>
-              </div>
-              <div class="weather-stat">
-                <span class="stat-icon">☀️</span>
-                <span class="stat-label">UV Index</span>
-                <span class="stat-value">{{ weather.uvIndex }}</span>
-              </div>
-              <div class="weather-stat">
-                <span class="stat-icon">💦</span>
-                <span class="stat-label">Dew Point</span>
-                <span class="stat-value">{{ weather.dewPoint }}°F / {{ dewPointC }}°C</span>
-              </div>
-              <div class="weather-stat">
-                <span class="stat-icon">☁️</span>
-                <span class="stat-label">Cloud Cover</span>
-                <span class="stat-value">{{ weather.cloudCover }}%</span>
-              </div>
-              <div class="weather-stat">
-                <span class="stat-icon">🌅</span>
-                <span class="stat-label">Sunrise</span>
-                <span class="stat-value">{{ weather.sunrise }}</span>
-              </div>
-              <div class="weather-stat">
-                <span class="stat-icon">🌇</span>
-                <span class="stat-label">Sunset</span>
-                <span class="stat-value">{{ weather.sunset }}</span>
-              </div>
-            </div>
+            <h3 class="nav-card-title">Design Tools</h3>
+            <p class="nav-card-desc">Interactive calculators for power electronics</p>
+            <span class="nav-card-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </span>
           </div>
         </div>
 
-        <!-- Row 2: Progress Bars and Status -->
-        <div class="widget-row">
-          <!-- Progress Widget -->
-          <div class="widget progress-widget">
-            <div class="widget-header">
-              <span class="widget-icon">📊</span>
-              <span class="widget-title">Progress</span>
+        <!-- ==================== COVER WIDGETS ROW ==================== -->
+        <div class="cover-widgets">
+          <!-- USA Clock -->
+          <div class="widget widget-clock">
+            <div class="widget-head">
+              <span class="widget-flag">🇺🇸</span>
+              <span class="widget-label">Madison, WI</span>
             </div>
-            <div class="progress-item">
-              <div class="progress-label">
-                <span>Today</span>
-                <span>{{ dayProgress | number:'1.1-1' }}%</span>
-              </div>
-              <div class="progress-bar">
-                <div class="progress-fill day" [style.width.%]="dayProgress"></div>
-              </div>
-            </div>
-            <div class="progress-item">
-              <div class="progress-label">
-                <span>Year 2025</span>
-                <span>{{ yearProgress | number:'1.1-1' }}%</span>
-              </div>
-              <div class="progress-bar">
-                <div class="progress-fill year" [style.width.%]="yearProgress"></div>
-              </div>
-            </div>
+            <div class="widget-time">{{ usaTime | date:'h:mm a' }}</div>
+            <div class="widget-sub">{{ usaTime | date:'EEE, MMM d' }} · CST</div>
           </div>
 
-          <!-- Currently Status Widget -->
-          <div class="widget status-widget">
-            <div class="widget-header">
-              <span class="widget-icon">💭</span>
-              <span class="widget-title">Currently</span>
+          <!-- India Clock -->
+          <div class="widget widget-clock">
+            <div class="widget-head">
+              <span class="widget-flag">🇮🇳</span>
+              <span class="widget-label">India</span>
             </div>
-            <div class="status-items">
-              <div class="status-item">
-                <span class="status-icon">📍</span>
-                <span class="status-text">{{ currentStatus.location }}</span>
-              </div>
-              <div class="status-item">
-                <span class="status-icon">🎯</span>
-                <span class="status-text">{{ currentStatus.workingOn }}</span>
-              </div>
-              <div class="status-item">
-                <span class="status-icon">☕</span>
-                <span class="status-text">{{ currentStatus.coffeeCount }} cups today</span>
-              </div>
-              <div class="status-item">
-                <span class="status-icon">🎵</span>
-                <span class="status-text">{{ currentStatus.listening }}</span>
-              </div>
-            </div>
+            <div class="widget-time">{{ indiaTime | date:'h:mm a' }}</div>
+            <div class="widget-sub">{{ indiaTime | date:'EEE, MMM d' }} · IST</div>
           </div>
 
-          <!-- Quote Widget -->
-          <div class="widget quote-widget">
-            <div class="widget-header">
-              <span class="widget-icon">💬</span>
-              <span class="widget-title">Quote</span>
+          <!-- Weather -->
+          <div class="widget widget-weather">
+            <div class="widget-head">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+              </svg>
+              <span class="widget-label">{{ weather.location }}</span>
             </div>
-            <div class="quote-content">
-              <p class="quote-text">"{{ currentQuote.text }}"</p>
-              <p class="quote-author">— {{ currentQuote.author }}</p>
-            </div>
-            <div class="quote-controls">
-              <button class="quote-btn" (click)="prevQuote()">←</button>
-              <span class="quote-dots">
-                <span *ngFor="let q of quotes; let i = index"
-                      class="dot" [class.active]="i === currentQuoteIndex"></span>
-              </span>
-              <button class="quote-btn" (click)="nextQuote()">→</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Row 3: Fidgets, GitHub, Theme -->
-        <div class="widget-row">
-          <!-- Fidget Widget -->
-          <div class="widget fidget-widget">
-            <div class="widget-header">
-              <span class="widget-icon">🎮</span>
-              <span class="widget-title">Fidgets</span>
-            </div>
-            <div class="fidgets-container">
-              <!-- Spinner -->
-              <div class="fidget-spinner" (click)="spinFidget()">
-                <svg viewBox="0 0 100 100" [style.transform]="'rotate(' + spinnerRotation + 'deg)'">
-                  <circle cx="50" cy="50" r="8" fill="currentColor"/>
-                  <circle cx="50" cy="20" r="15" fill="currentColor"/>
-                  <circle cx="76" cy="65" r="15" fill="currentColor"/>
-                  <circle cx="24" cy="65" r="15" fill="currentColor"/>
-                  <line x1="50" y1="50" x2="50" y2="20" stroke="currentColor" stroke-width="8"/>
-                  <line x1="50" y1="50" x2="76" y2="65" stroke="currentColor" stroke-width="8"/>
-                  <line x1="50" y1="50" x2="24" y2="65" stroke="currentColor" stroke-width="8"/>
-                </svg>
-                <span class="fidget-label">Click to spin!</span>
-              </div>
-              <!-- Toggles -->
-              <div class="toggle-group">
-                <div class="toggle-switch" (click)="toggleSwitch('toggle1')">
-                  <div class="toggle-track" [class.active]="toggleStates.toggle1">
-                    <div class="toggle-thumb"></div>
-                  </div>
-                </div>
-                <div class="toggle-switch" (click)="toggleSwitch('toggle2')">
-                  <div class="toggle-track" [class.active]="toggleStates.toggle2">
-                    <div class="toggle-thumb"></div>
-                  </div>
-                </div>
-                <div class="toggle-switch" (click)="toggleSwitch('toggle3')">
-                  <div class="toggle-track" [class.active]="toggleStates.toggle3">
-                    <div class="toggle-thumb"></div>
-                  </div>
-                </div>
-              </div>
-              <!-- Slider -->
-              <div class="fidget-slider">
-                <input type="range" min="0" max="100" [(ngModel)]="sliderValue" class="slider-input"/>
-                <span class="slider-value">{{ sliderValue }}</span>
-              </div>
-            </div>
+            <div class="widget-time">{{ weather.tempF }}°F <span class="widget-temp-c">/ {{ tempC }}°C</span></div>
+            <div class="widget-sub">{{ weather.condition }} · {{ weather.humidity }}% humidity</div>
           </div>
 
-          <!-- GitHub Widget -->
-          <div class="widget github-widget">
-            <div class="widget-header">
-              <span class="widget-icon">📈</span>
-              <span class="widget-title">Activity</span>
+          <!-- Currently -->
+          <div class="widget widget-status">
+            <div class="widget-head">
+              <span class="status-dot"></span>
+              <span class="widget-label">Currently</span>
             </div>
-            <div class="github-grid">
-              <div *ngFor="let week of githubContributions" class="github-week">
-                <div *ngFor="let day of week"
-                     class="github-day"
-                     [style.background]="getContributionColor(day)">
-                </div>
-              </div>
-            </div>
-            <div class="github-legend">
-              <span>Less</span>
-              <div class="legend-squares">
-                <div *ngFor="let i of [0,1,2,3,4]" [style.background]="getContributionColor(i)"></div>
-              </div>
-              <span>More</span>
-            </div>
-          </div>
-
-          <!-- Theme Picker Widget -->
-          <div class="widget theme-widget">
-            <div class="widget-header">
-              <span class="widget-icon">🎨</span>
-              <span class="widget-title">Theme</span>
-            </div>
-            <div class="theme-colors">
-              <button *ngFor="let color of themeColors"
-                      class="theme-color-btn"
-                      [style.background]="color.value"
-                      [class.active]="selectedThemeColor === color.value"
-                      (click)="setThemeColor(color.value)"
-                      [title]="color.name">
-              </button>
-            </div>
-            <div class="theme-preview">
-              <span [style.color]="selectedThemeColor">● Active Color</span>
-            </div>
+            <div class="widget-status-text">{{ currentStatus.workingOn }}</div>
+            <div class="widget-sub">📍 {{ currentStatus.location }}</div>
           </div>
         </div>
       </div>
+    </section>
+  </ng-container>
 
-      <!-- Scroll Indicator -->
-      <div class="scroll-indicator" (click)="scrollToSection('about')">
-        <span class="scroll-text">Scroll to explore</span>
-        <div class="scroll-arrow">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 5v14M5 12l7 7 7-7"/>
-          </svg>
-        </div>
-      </div>
+  <!-- ==================== ABOUT ME PAGE ==================== -->
+  <ng-container *ngIf="currentPage === 'about'">
+    <!-- Back Navigation -->
+    <div class="page-header">
+      <button class="back-btn" (click)="navigateTo('home')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Home
+      </button>
+      <h2 class="page-title">About Me</h2>
     </div>
-  </section>
 
-  <!-- About Section -->
-  <section id="about" class="section about-section">
+    <!-- About Section -->
+    <section id="about" class="section about-section">
     <div class="section-content">
       <h2 class="section-title">About Me</h2>
       <p class="about-text">{{ aboutMe }}</p>
@@ -558,8 +353,36 @@
     </div>
   </section>
 
-  <!-- Research Projects Section -->
-  <section id="research" class="section research-section">
+  <!-- Publications Section (part of About) -->
+  <section id="publications" class="section publications-section">
+    <div class="section-content">
+      <h2 class="section-title">Publications</h2>
+      <div class="publications-list">
+        <div class="publication-card" *ngFor="let pub of publications">
+          <h3>{{ pub.title }}</h3>
+          <p class="journal">{{ pub.journal }} - {{ pub.year }}</p>
+          <a [href]="pub.link" target="_blank" class="pub-link" *ngIf="pub.link !== '#'">View Publication</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  </ng-container>
+
+  <!-- ==================== RESEARCH PAGE ==================== -->
+  <ng-container *ngIf="currentPage === 'research'">
+    <!-- Back Navigation -->
+    <div class="page-header">
+      <button class="back-btn" (click)="navigateTo('home')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Home
+      </button>
+      <h2 class="page-title">Research</h2>
+    </div>
+
+    <!-- Research Projects Section -->
+    <section id="research" class="section research-section">
     <div class="section-content">
       <h2 class="section-title">Research Projects</h2>
       <div class="research-grid">
@@ -637,12 +460,26 @@
       </div>
     </div>
   </section>
+  </ng-container>
 
-  <!-- Design Tools Section -->
-  <section id="design-tools" class="section design-tools-section">
-    <div class="section-content">
-      <h2 class="section-title">Power Electronics Design Tools</h2>
-      <p class="design-tools-description">Interactive calculators and utilities for power electronics design workflow.</p>
+  <!-- ==================== DESIGN TOOLS PAGE ==================== -->
+  <ng-container *ngIf="currentPage === 'design-tools'">
+    <!-- Back Navigation -->
+    <div class="page-header">
+      <button class="back-btn" (click)="navigateTo('home')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Home
+      </button>
+      <h2 class="page-title">Design Tools</h2>
+    </div>
+
+    <!-- Design Tools Section -->
+    <section id="design-tools" class="section design-tools-section">
+      <div class="section-content">
+        <h2 class="section-title">Power Electronics Design Tools</h2>
+        <p class="design-tools-description">Interactive calculators and utilities for power electronics design workflow.</p>
 
       <!-- Tool Selector Dropdown -->
       <div class="tool-selector">
@@ -661,6 +498,33 @@
                   (click)="selectDesignTool(tool.id)">
             {{ tool.name }}
           </button>
+        </div>
+      </div>
+
+      <!-- CSI Design Tool Content -->
+      <div class="tool-content csi-tool-content" *ngIf="selectedDesignTool === 'csi-tool'">
+        <div class="tool-header">
+          <h3>CSI Design Tool</h3>
+          <p>Interactive Current Source Inverter design tool for sizing, analysis, and component selection.</p>
+        </div>
+
+        <div class="csi-embed-actions">
+          <a href="https://csi-design-tool.vercel.app/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+            Open in new tab
+          </a>
+        </div>
+
+        <div class="csi-embed">
+          <iframe
+            src="https://csi-design-tool.vercel.app/"
+            title="CSI Design Tool"
+            loading="lazy"
+            allow="fullscreen"></iframe>
         </div>
       </div>
 
@@ -709,25 +573,50 @@
         </div>
       </div>
 
+      <!-- Quantity Multiplier Controls -->
+      <div class="multiplier-controls" *ngIf="bomResults.length > 0">
+        <div class="multiplier-field">
+          <label>Number of Boards</label>
+          <input type="number" [(ngModel)]="boardCount" (ngModelChange)="recalculateQuantities()" min="1" max="9999" class="multiplier-input">
+        </div>
+        <div class="multiplier-separator">×</div>
+        <div class="multiplier-field">
+          <label>Spare %</label>
+          <input type="number" [(ngModel)]="sparePercent" (ngModelChange)="recalculateQuantities()" min="0" max="100" class="multiplier-input">
+          <span class="multiplier-unit">%</span>
+        </div>
+        <div class="qty-formula" *ngIf="boardCount > 1 || sparePercent > 0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Order qty = ceil(BOM qty × {{ boardCount }} boards × {{ (1 + sparePercent / 100) | number:'1.1-2' }})
+        </div>
+      </div>
+
       <!-- DigiKey Cart Creation -->
       <div class="digikey-cart-section" *ngIf="bomResults.length > 0">
         <div class="cart-header">
           <h3>Create DigiKey Cart</h3>
-          <p>Automatically add all {{ bomResults.length }} components to your DigiKey cart</p>
+          <p>{{ bomResults.length }} components · {{ boardCount }} board(s) · {{ sparePercent }}% spare</p>
         </div>
 
         <div class="cart-actions">
           <button
             class="btn btn-digikey"
             (click)="createDigiKeyCart()"
-            [disabled]="isCreatingCart || !selectedQuantityColumn">
-            <svg *ngIf="!isCreatingCart" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            [disabled]="!selectedQuantityColumn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="9" cy="21" r="1"/>
               <circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
-            <span class="spinner" *ngIf="isCreatingCart"></span>
-            {{ isCreatingCart ? 'Creating Cart...' : 'Create DigiKey Cart' }}
+            Add to DigiKey Cart
+          </button>
+          <button class="btn btn-secondary" (click)="exportBomCsv()" [disabled]="bomResults.length === 0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export CSV
           </button>
           <span class="cart-note" *ngIf="!selectedQuantityColumn">
             Please select a Quantity column to enable cart creation
@@ -742,15 +631,15 @@
               <polyline points="22 4 12 14.01 9 11.01"/>
             </svg>
           </div>
-          <h4>Cart Created Successfully!</h4>
-          <p>Your {{ bomResults.length }} components are ready on DigiKey</p>
+          <h4>Ready!</h4>
+          <p>{{ bomMessage }}</p>
           <a [href]="digiKeyCartUrl" target="_blank" rel="noopener noreferrer" class="btn btn-digikey-open">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
               <polyline points="15 3 21 3 21 9"/>
               <line x1="10" y1="14" x2="21" y2="3"/>
             </svg>
-            Open DigiKey Cart
+            View DigiKey Cart
           </a>
         </div>
       </div>
@@ -770,13 +659,15 @@
           <div class="table-header">
             <span class="col-num">#</span>
             <span class="col-part">Part Number</span>
-            <span class="col-qty">Qty</span>
+            <span class="col-qty">BOM Qty</span>
+            <span class="col-qty col-order-qty">Order Qty</span>
             <span class="col-link">DigiKey Link</span>
           </div>
           <div class="table-row" *ngFor="let item of bomResults; let i = index">
             <span class="col-num">{{ i + 1 }}</span>
             <span class="col-part">{{ item.partNumber }}</span>
-            <span class="col-qty">{{ item.quantity }}</span>
+            <span class="col-qty">{{ item.baseQuantity }}</span>
+            <span class="col-qty col-order-qty" [class.qty-adjusted]="item.quantity !== item.baseQuantity">{{ item.quantity }}</span>
             <span class="col-link">
               <a [href]="item.digikeyUrl" target="_blank" rel="noopener noreferrer">
                 Search on DigiKey
@@ -791,136 +682,11 @@
         </div>
       </div>
 
-      <div class="bom-message" *ngIf="bomMessage">
-        <p [class.error]="bomMessageType === 'error'" [class.success]="bomMessageType === 'success'">{{ bomMessage }}</p>
+      <div class="bom-message" *ngIf="bomMessage && bomMessageType === 'error'">
+        <p class="error">{{ bomMessage }}</p>
       </div>
-      </div>
-
-      <!-- LaTeX Tool Content -->
-      <div class="tool-content" *ngIf="selectedDesignTool === 'latex-tool'">
-        <div class="tool-header">
-          <h3>Word & LaTeX Converter</h3>
-          <p>Convert between Word documents and LaTeX code for academic writing.</p>
-        </div>
-
-        <!-- Tab Buttons -->
-        <div class="latex-tabs">
-        <button [class.active]="latexActiveTab === 'word-to-latex'" (click)="latexActiveTab = 'word-to-latex'">
-          Word to LaTeX
-        </button>
-        <button [class.active]="latexActiveTab === 'latex-to-word'" (click)="latexActiveTab = 'latex-to-word'">
-          LaTeX to Word
-        </button>
-      </div>
-
-      <!-- Word to LaTeX Tab -->
-      <div class="latex-tab-content" *ngIf="latexActiveTab === 'word-to-latex'">
-        <div class="latex-upload-area"
-             [class.drag-over]="isLatexDragOver"
-             (dragover)="onLatexDragOver($event)"
-             (dragleave)="onLatexDragLeave($event)"
-             (drop)="onLatexDrop($event)">
-          <div class="upload-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
-            </svg>
-          </div>
-          <p>Drag & drop your Word file here</p>
-          <span class="upload-or">or</span>
-          <label class="upload-btn">
-            <input type="file" accept=".docx" (change)="onWordFileSelect($event)" hidden>
-            Browse Files
-          </label>
-          <span class="file-types">Supported: .docx</span>
-        </div>
-
-        <div class="latex-output" *ngIf="latexOutput">
-          <div class="output-header">
-            <h3>LaTeX Output</h3>
-            <div class="output-actions">
-              <button class="btn btn-secondary" (click)="copyLatexOutput()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
-                Copy
-              </button>
-              <button class="btn btn-primary" (click)="downloadLatexFile()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="7 10 12 15 17 10"/>
-                  <line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
-                Download .tex
-              </button>
-            </div>
-          </div>
-          <pre class="latex-code">{{ latexOutput }}</pre>
-        </div>
-      </div>
-
-      <!-- LaTeX to Word Tab -->
-      <div class="latex-tab-content" *ngIf="latexActiveTab === 'latex-to-word'">
-        <div class="latex-input-area">
-          <textarea
-            [(ngModel)]="latexInput"
-            placeholder="Paste your LaTeX code here...
-
-Example:
-\documentclass{article}
-\begin{document}
-\section{Introduction}
-This is a sample document with \textbf{bold} and \textit{italic} text.
-\end{document}"
-            rows="12"></textarea>
-        </div>
-        <div class="latex-actions">
-          <button class="btn btn-primary" (click)="convertLatexToWord()" [disabled]="!latexInput.trim()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-            </svg>
-            Convert & Download Word
-          </button>
-        </div>
-      </div>
-
-      <div class="latex-message" *ngIf="latexMessage">
-        <p [class.error]="latexMessageType === 'error'" [class.success]="latexMessageType === 'success'">{{ latexMessage }}</p>
-      </div>
-
-      <div class="latex-features">
-        <h4>Supported Conversions:</h4>
-        <div class="features-grid">
-          <div class="feature-item">
-            <span class="feature-icon">B</span>
-            <span>Bold text</span>
-          </div>
-          <div class="feature-item">
-            <span class="feature-icon"><em>I</em></span>
-            <span>Italic text</span>
-          </div>
-          <div class="feature-item">
-            <span class="feature-icon">H</span>
-            <span>Headings</span>
-          </div>
-          <div class="feature-item">
-            <span class="feature-icon">&bull;</span>
-            <span>Lists</span>
-          </div>
-          <div class="feature-item">
-            <span class="feature-icon">&#8747;</span>
-            <span>Equations</span>
-          </div>
-          <div class="feature-item">
-            <span class="feature-icon">&#182;</span>
-            <span>Paragraphs</span>
-          </div>
-        </div>
+      <div class="bom-message" *ngIf="bomMessage && bomMessageType === 'success' && !digiKeyCartUrl">
+        <p class="success">{{ bomMessage }}</p>
       </div>
       </div>
 
@@ -1002,7 +768,7 @@ This is a sample document with \textbf{bold} and \textit{italic} text.
                 <line x1="80" y1="130" x2="80" y2="140" stroke="currentColor" stroke-width="2"/>
                 <line x1="95" y1="130" x2="95" y2="140" stroke="currentColor" stroke-width="2"/>
                 <line x1="95" y1="140" x2="120" y2="140" stroke="currentColor" stroke-width="2"/>
-                <text x="87" y="165" class="component-label">C</text>
+                <text x="87" y="170" text-anchor="middle" class="component-label">C<tspan dx="2" class="component-sub">dc</tspan></text>
               </g>
               <!-- Inductor (CSI) -->
               <g *ngIf="inverterType === 'CSI'" class="inductor-symbol">
@@ -1010,14 +776,15 @@ This is a sample document with \textbf{bold} and \textit{italic} text.
                 <path d="M70,60 Q80,40 90,60 Q100,80 110,60" fill="none" stroke="#00d4ff" stroke-width="3"/>
                 <line x1="110" y1="60" x2="120" y2="60" stroke="currentColor" stroke-width="2"/>
                 <line x1="60" y1="140" x2="120" y2="140" stroke="currentColor" stroke-width="2"/>
-                <text x="85" y="45" class="component-label">L</text>
+                <text x="90" y="32" text-anchor="middle" class="component-label">L<tspan dx="2" class="component-sub">dc</tspan></text>
               </g>
             </g>
 
             <!-- Inverter Bridge -->
             <g class="inverter-bridge">
               <rect x="140" y="50" width="100" height="100" fill="none" stroke="currentColor" stroke-width="2" rx="5"/>
-              <text x="190" y="105" text-anchor="middle" class="bridge-label">Full Inverter</text>
+              <text x="190" y="42" text-anchor="middle" class="bridge-label">FULL INVERTER</text>
+              <text x="190" y="105" text-anchor="middle" class="bridge-sub">{{ inverterType }}</text>
 
               <!-- Animated switches -->
               <g class="switch sw1" [class.on]="switchState[0]">
@@ -1044,17 +811,17 @@ This is a sample document with \textbf{bold} and \textit{italic} text.
                 <path d="M280,60 Q290,40 300,60 Q310,80 320,60" fill="none" stroke="#ff6b6b" stroke-width="2"/>
                 <line x1="340" y1="50" x2="340" y2="70" stroke="#ff6b6b" stroke-width="2"/>
                 <line x1="350" y1="50" x2="350" y2="70" stroke="#ff6b6b" stroke-width="2"/>
-                <text x="315" y="90" class="filter-label">LC Filter</text>
+                <text x="315" y="170" text-anchor="middle" class="filter-label">LC FILTER</text>
               </g>
               <g *ngIf="inverterType === 'CSI'">
                 <line x1="290" y1="50" x2="290" y2="70" stroke="#ff6b6b" stroke-width="2"/>
                 <line x1="300" y1="50" x2="300" y2="70" stroke="#ff6b6b" stroke-width="2"/>
-                <text x="295" y="90" class="filter-label">C Filter</text>
+                <text x="295" y="170" text-anchor="middle" class="filter-label">C FILTER</text>
               </g>
 
               <!-- Load -->
               <circle cx="370" cy="100" r="20" fill="none" stroke="currentColor" stroke-width="2"/>
-              <text x="370" y="105" text-anchor="middle" class="load-label">Load</text>
+              <text x="370" y="170" text-anchor="middle" class="load-label">LOAD</text>
             </g>
 
             <!-- Energy flow indicator -->
@@ -1688,7 +1455,7 @@ This is a sample document with \textbf{bold} and \textit{italic} text.
       <div class="tool-content snubber-tool-content" *ngIf="selectedDesignTool === 'snubber-tool'">
         <div class="tool-header">
           <h3>Snubber Design Calculator</h3>
-          <p>Design RC, RCD, or TVS clamp snubbers to suppress voltage spikes and ringing in power switches.</p>
+          <p>Design RC, RCD, or TVS clamp snubbers to suppress voltage spikes and ringing in power switches. The RC mode follows TI's seven-step method (SSZTBC7): measure the ring frequency, add a known cap to shift it, then back out the parasitics. The RCD mode uses the Daycounter clamping-snubber equations to absorb the leakage energy within a chosen overshoot.</p>
         </div>
 
         <div class="snubber-calculator">
@@ -1703,13 +1470,31 @@ This is a sample document with \textbf{bold} and \textit{italic} text.
                 <label>Load Current (A)</label>
                 <input type="number" [(ngModel)]="snubberInputs.current" min="0.1" max="500">
               </div>
-              <div class="input-group">
+              <!-- TI seven-step RC method: measured ring frequencies + a known added cap -->
+              <div class="input-group" *ngIf="snubberInputs.snubberType === 'rc'">
+                <label>Ring Freq, no snubber f₀ (MHz)</label>
+                <input type="number" [(ngModel)]="snubberInputs.ringFreqUnsnubbed" min="0.1" max="500" step="0.1">
+              </div>
+              <div class="input-group" *ngIf="snubberInputs.snubberType === 'rc'">
+                <label>Added Cap C₁ (pF)</label>
+                <input type="number" [(ngModel)]="snubberInputs.addedCap" min="1" max="100000">
+              </div>
+              <div class="input-group" *ngIf="snubberInputs.snubberType === 'rc'">
+                <label>Ring Freq with C₁, f₁ (MHz)</label>
+                <input type="number" [(ngModel)]="snubberInputs.ringFreqShifted" min="0.1" max="500" step="0.1">
+              </div>
+              <!-- Parasitic-LC method (RCD / TVS clamp) -->
+              <div class="input-group" *ngIf="snubberInputs.snubberType !== 'rc'">
                 <label>Device C_oss (pF)</label>
                 <input type="number" [(ngModel)]="snubberInputs.deviceCoss" min="1" max="10000">
               </div>
-              <div class="input-group">
-                <label>Stray Inductance (nH)</label>
-                <input type="number" [(ngModel)]="snubberInputs.strayInductance" min="1" max="1000">
+              <div class="input-group" *ngIf="snubberInputs.snubberType !== 'rc'">
+                <label>{{ snubberInputs.snubberType === 'rcd' ? 'Leakage Inductance (nH)' : 'Stray Inductance (nH)' }}</label>
+                <input type="number" [(ngModel)]="snubberInputs.strayInductance" min="1" max="100000">
+              </div>
+              <div class="input-group" *ngIf="snubberInputs.snubberType === 'rcd'">
+                <label>Clamp Overshoot dV (V)</label>
+                <input type="number" [(ngModel)]="snubberInputs.clampRipple" min="1" max="2000">
               </div>
               <div class="input-group">
                 <label>Switching Freq (kHz)</label>
@@ -1779,6 +1564,18 @@ This is a sample document with \textbf{bold} and \textit{italic} text.
                 <span class="result-label">Damping Factor</span>
                 <span class="result-value">{{ snubberResults.dampingFactor | number:'1.2-2' }}</span>
               </div>
+              <div class="result-card" *ngIf="snubberInputs.snubberType === 'rc'">
+                <span class="result-label">Parasitic C₀</span>
+                <span class="result-value">{{ snubberResults.parasiticC | number:'1.0-0' }} pF</span>
+              </div>
+              <div class="result-card" *ngIf="snubberInputs.snubberType === 'rc'">
+                <span class="result-label">Parasitic L</span>
+                <span class="result-value">{{ snubberResults.parasiticL | number:'1.0-0' }} nH</span>
+              </div>
+              <div class="result-card" *ngIf="snubberInputs.snubberType === 'rc'">
+                <span class="result-label">Freq Shift Ratio m</span>
+                <span class="result-value">{{ snubberResults.freqRatio | number:'1.2-2' }}</span>
+              </div>
               <div class="result-card" *ngIf="snubberResults.clampVoltage > 0">
                 <span class="result-label">Clamp Voltage</span>
                 <span class="result-value">{{ snubberResults.clampVoltage | number:'1.0-0' }} V</span>
@@ -1792,23 +1589,164 @@ This is a sample document with \textbf{bold} and \textit{italic} text.
         </div>
       </div>
 
-    </div>
-  </section>
+      <!-- ==================== EQUATION STUDIO ==================== -->
+      <div class="tool-content eqn-studio-tool-content" *ngIf="selectedDesignTool === 'eqn-studio'">
+        <div class="tool-header">
+          <h3>Equation Studio</h3>
+          <p>Write equations and text visually — no LaTeX needed. Format it, then copy or download as SVG/PNG for Inkscape.</p>
+        </div>
 
-  <!-- Publications Section -->
-  <section id="publications" class="section publications-section">
-    <div class="section-content">
-      <h2 class="section-title">Publications</h2>
-      <div class="publications-list">
-        <div class="publication-card" *ngFor="let pub of publications">
-          <h3>{{ pub.title }}</h3>
-          <p class="journal">{{ pub.journal }} - {{ pub.year }}</p>
-          <a [href]="pub.link" target="_blank" class="pub-link" *ngIf="pub.link !== '#'">View Publication</a>
+        <div class="eqn-studio">
+          <!-- Left: editor + controls -->
+          <div class="eqn-editor-pane">
+            <!-- Formatting toolbar -->
+            <div class="eqn-toolbar">
+              <div class="eqn-btn-group">
+                <button type="button" class="eqn-fmt-btn" title="Bold" (click)="eqnBold()"><strong>B</strong></button>
+                <button type="button" class="eqn-fmt-btn" title="Italic" (click)="eqnItalic()"><em>I</em></button>
+                <button type="button" class="eqn-fmt-btn" title="Underline" (click)="eqnUnderline()"><u>U</u></button>
+              </div>
+              <select class="eqn-select" [ngModel]="eqnFont" (ngModelChange)="eqnSetFont($event)" title="Font style">
+                <option value="normal">Serif</option>
+                <option value="sans-serif">Sans-serif</option>
+                <option value="monospace">Monospace</option>
+                <option value="script">Script</option>
+                <option value="double-struck">Blackboard</option>
+                <option value="fraktur">Fraktur</option>
+              </select>
+              <select class="eqn-select" [ngModel]="eqnSize" (ngModelChange)="eqnSetSize($event)" title="Font size">
+                <option [ngValue]="1">XS</option>
+                <option [ngValue]="2">Small</option>
+                <option [ngValue]="4">Normal</option>
+                <option [ngValue]="6">Large</option>
+                <option [ngValue]="8">XL</option>
+                <option [ngValue]="10">Huge</option>
+              </select>
+              <label class="eqn-color-label" title="Text color">
+                <input type="color" [(ngModel)]="eqnColor" (input)="eqnSetColor(eqnColor)">
+              </label>
+            </div>
+
+            <!-- Quick-insert palette (grouped). The field's keyboard icon has even more. -->
+            <div class="eqn-palette">
+              <div class="eqn-palette-group" *ngFor="let g of eqnPalette">
+                <span class="eqn-group-label">{{ g.name }}</span>
+                <div class="eqn-group-btns">
+                  <button type="button" class="eqn-sym-btn" *ngFor="let p of g.items"
+                          (click)="eqnInsert(p.latex)" [title]="p.latex">{{ p.label }}</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Visual equation field (MathLive). Click the keyboard icon for the full symbol palette. -->
+            <math-field #mathField class="eqn-field" (input)="renderEqnPreview()">E = mc^2</math-field>
+            <p class="eqn-hint">Type normally, or tap the keyboard icon in the field for fractions, integrals, Greek letters and more.</p>
+
+            <button type="button" class="btn btn-secondary eqn-clear" (click)="eqnClear()">Clear</button>
+          </div>
+
+          <!-- Right: export preview + actions -->
+          <div class="eqn-output-pane">
+            <h4>Preview (this is what gets exported)</h4>
+            <div class="eqn-preview" [class.transparent]="eqnTransparentBg" [innerHTML]="eqnSafePreview"></div>
+
+            <div class="eqn-export-options">
+              <label class="eqn-opt">
+                <span>Font size</span>
+                <select class="eqn-select" [ngModel]="eqnOutputSize" (ngModelChange)="eqnSetOutputSize($event)">
+                  <option [ngValue]="8">8 pt</option>
+                  <option [ngValue]="9">9 pt</option>
+                  <option [ngValue]="10">10 pt</option>
+                  <option [ngValue]="11">11 pt</option>
+                  <option [ngValue]="12">12 pt</option>
+                  <option [ngValue]="14">14 pt</option>
+                  <option [ngValue]="16">16 pt</option>
+                  <option [ngValue]="18">18 pt</option>
+                  <option [ngValue]="20">20 pt</option>
+                  <option [ngValue]="24">24 pt</option>
+                  <option [ngValue]="28">28 pt</option>
+                  <option [ngValue]="36">36 pt</option>
+                  <option [ngValue]="48">48 pt</option>
+                  <option [ngValue]="72">72 pt</option>
+                </select>
+              </label>
+              <label class="eqn-opt">
+                <span>PNG sharpness</span>
+                <select class="eqn-select" [(ngModel)]="eqnPngScale">
+                  <option [ngValue]="1">High-res</option>
+                  <option [ngValue]="2">Extra (2×)</option>
+                  <option [ngValue]="3">Max (3×)</option>
+                </select>
+              </label>
+              <label class="eqn-opt eqn-checkbox">
+                <input type="checkbox" [(ngModel)]="eqnTransparentBg">
+                <span>Transparent background (PNG)</span>
+              </label>
+            </div>
+
+            <div class="eqn-actions">
+              <button type="button" class="btn btn-primary" (click)="copyEqnSvg()">Copy SVG</button>
+              <button type="button" class="btn btn-secondary" (click)="downloadEqnSvg()">Download SVG</button>
+              <button type="button" class="btn btn-primary" (click)="copyEqnPng()">Copy PNG</button>
+              <button type="button" class="btn btn-secondary" (click)="downloadEqnPng()">Download PNG</button>
+            </div>
+
+            <div class="eqn-message" [class.success]="eqnMessageType === 'success'"
+                 [class.error]="eqnMessageType === 'error'" *ngIf="eqnMessage">{{ eqnMessage }}</div>
+          </div>
         </div>
       </div>
+
     </div>
   </section>
+  </ng-container>
 
+  <!-- ==================== BLOG PAGE ==================== -->
+  <ng-container *ngIf="currentPage === 'blog'">
+    <div class="page-header">
+      <button class="back-btn" (click)="navigateTo('home')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Home
+      </button>
+      <h2 class="page-title">Blog</h2>
+    </div>
+
+    <section id="blog" class="section blog-section">
+      <div class="section-content">
+        <h2 class="section-title">Writing</h2>
+        <p class="blog-intro">Notes on power electronics, motor drives, PhD life, and occasional engineering deep-dives.</p>
+
+        <div class="blog-grid">
+          <a *ngFor="let post of blogPosts" [href]="post.url" target="_blank" rel="noopener noreferrer" class="blog-card">
+            <div class="blog-card-meta">
+              <span class="blog-card-platform">{{ post.platform }}</span>
+              <span class="blog-card-date">{{ post.date | date:'MMM d, yyyy' }}</span>
+            </div>
+            <h3 class="blog-card-title">{{ post.title }}</h3>
+            <p class="blog-card-excerpt">{{ post.excerpt }}</p>
+            <div class="blog-card-tags">
+              <span class="blog-tag" *ngFor="let tag of post.tags">{{ tag }}</span>
+            </div>
+            <div class="blog-card-footer">
+              <span class="blog-card-read">{{ post.readTime }}</span>
+              <span class="blog-card-link">
+                Read on {{ post.platform }}
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/>
+                  <line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+              </span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+  </ng-container>
+
+  <!-- ==================== CONTACT (always visible) ==================== -->
   <!-- Contact Section -->
   <section id="contact" class="section contact-section">
     <div class="section-content">

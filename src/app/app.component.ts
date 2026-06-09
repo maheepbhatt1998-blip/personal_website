@@ -1,15 +1,19 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, CUSTOM_ELEMENTS_SCHEMA, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import * as XLSX from 'xlsx';
-import * as mammoth from 'mammoth';
-import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
 import { saveAs } from 'file-saver';
+
+// Loaded at runtime from CDN (see src/index.html)
+declare const MathJax: any;
+declare const MathfieldElement: any;
 
 interface BomResult {
   partNumber: string;
   digikeyUrl: string;
-  quantity: number;
+  baseQuantity: number;   // raw qty from BOM
+  quantity: number;       // adjusted = ceil(base * boards * (1 + spare/100))
 }
 
 @Component({
@@ -17,11 +21,115 @@ interface BomResult {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]   // allow the <math-field> custom element (MathLive)
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   // Expose Math to template
   Math = Math;
+
+  constructor(private sanitizer: DomSanitizer) {}
+
+  // ==================== PAGE NAVIGATION ====================
+  currentPage: 'home' | 'about' | 'research' | 'design-tools' | 'blog' = 'home';
+
+  navigateTo(page: 'home' | 'about' | 'research' | 'design-tools' | 'blog'): void {
+    this.currentPage = page;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      this.setupRevealAnimations();
+      if (page === 'home') this.setupHeroInteractions();
+    }, 50);
+  }
+
+  // ==================== SCROLL-REVEAL ANIMATIONS ====================
+  private revealObserver: IntersectionObserver | null = null;
+
+  ngAfterViewInit(): void {
+    this.setupRevealAnimations();
+    if (this.currentPage === 'home') this.setupHeroInteractions();
+    this.configureMathLive();
+  }
+
+  // Point the CDN-loaded MathLive at its font assets and silence its sounds.
+  private configureMathLive(): void {
+    if (typeof MathfieldElement === 'undefined') return;   // CDN may not have loaded yet
+    MathfieldElement.fontsDirectory = 'https://cdn.jsdelivr.net/npm/mathlive/dist/fonts';
+    MathfieldElement.soundsDirectory = null;
+  }
+
+  // ==================== HERO INTERACTIONS (parallax + magnetic cards) ====================
+  private setupHeroInteractions(): void {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const cover = document.querySelector<HTMLElement>('.cover-page');
+    if (cover && !cover.dataset['parallaxBound']) {
+      cover.dataset['parallaxBound'] = '1';
+      cover.addEventListener('mousemove', (e: MouseEvent) => {
+        const rect = cover.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width - 0.5) * 60;
+        const y = ((e.clientY - rect.top) / rect.height - 0.5) * 60;
+        cover.style.setProperty('--mx', `${x}px`);
+        cover.style.setProperty('--my', `${y}px`);
+      });
+      cover.addEventListener('mouseleave', () => {
+        cover.style.setProperty('--mx', '0px');
+        cover.style.setProperty('--my', '0px');
+      });
+    }
+
+    document.querySelectorAll<HTMLElement>('.nav-card').forEach(card => {
+      if (card.dataset['magneticBound']) return;
+      card.dataset['magneticBound'] = '1';
+
+      card.addEventListener('mousemove', (e: MouseEvent) => {
+        const rect = card.getBoundingClientRect();
+        const nx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+        const ny = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+        card.style.setProperty('--tilt-x', `${ny * -5}deg`);
+        card.style.setProperty('--tilt-y', `${nx * 5}deg`);
+        card.style.setProperty('--mag-x', `${nx * 10}px`);
+        card.style.setProperty('--mag-y', `${ny * 10}px`);
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.setProperty('--tilt-x', '0deg');
+        card.style.setProperty('--tilt-y', '0deg');
+        card.style.setProperty('--mag-x', '0px');
+        card.style.setProperty('--mag-y', '0px');
+      });
+    });
+  }
+
+  private setupRevealAnimations(): void {
+    if (typeof IntersectionObserver === 'undefined') return;
+
+    if (this.revealObserver) {
+      this.revealObserver.disconnect();
+    }
+
+    this.revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          this.revealObserver!.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+    document.querySelectorAll(
+      '.section .section-content, .timeline-item'
+    ).forEach(el => {
+      el.classList.add('reveal');
+      this.revealObserver!.observe(el);
+    });
+
+    document.querySelectorAll(
+      '.education-grid, .skills-grid, .research-grid, .pcb-grid, .tools-grid, .publications-list'
+    ).forEach(el => {
+      el.classList.add('reveal-stagger');
+      this.revealObserver!.observe(el);
+    });
+  }
 
   // ==================== COVER PAGE WIDGETS ====================
 
@@ -69,9 +177,7 @@ export class AppComponent implements OnInit, OnDestroy {
   // Currently Status
   currentStatus = {
     location: 'Madison, WI',
-    workingOn: 'CSI Loss Modeling Research',
-    coffeeCount: 3,
-    listening: 'Lo-fi Beats'
+    workingOn: 'CSI Loss Modeling Research'
   };
 
   // Quotes
@@ -86,35 +192,6 @@ export class AppComponent implements OnInit, OnDestroy {
   currentQuoteIndex = 0;
   currentQuote = this.quotes[0];
   private quoteInterval: any = null;
-
-  // Fidget Spinner
-  spinnerRotation = 0;
-  isSpinning = false;
-  private spinInterval: any = null;
-
-  // Toggle Switches
-  toggleStates = {
-    toggle1: false,
-    toggle2: true,
-    toggle3: false
-  };
-
-  // Draggable Slider
-  sliderValue = 50;
-
-  // GitHub Contribution Graph (Demo Data)
-  githubContributions: number[][] = [];
-
-  // Theme Colors
-  themeColors = [
-    { name: 'Cyan', value: '#00d4ff' },
-    { name: 'Green', value: '#00ff88' },
-    { name: 'Purple', value: '#a855f7' },
-    { name: 'Orange', value: '#ff8c00' },
-    { name: 'Pink', value: '#ff6b9d' },
-    { name: 'Yellow', value: '#ffd700' }
-  ];
-  selectedThemeColor = '#00d4ff';
 
   // Clock Methods
   updateClocks(): void {
@@ -174,90 +251,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.currentQuote = this.quotes[this.currentQuoteIndex];
   }
 
-  // Fidget Spinner Methods
-  spinFidget(): void {
-    if (this.isSpinning) return;
-
-    this.isSpinning = true;
-    const spinDuration = 3000 + Math.random() * 2000; // 3-5 seconds
-    const totalRotation = 1800 + Math.random() * 1800; // 5-10 full rotations
-    const startRotation = this.spinnerRotation;
-    const startTime = Date.now();
-
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / spinDuration, 1);
-
-      // Easing function (ease-out)
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      this.spinnerRotation = startRotation + (totalRotation * easeOut);
-
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        this.isSpinning = false;
-      }
-    };
-
-    requestAnimationFrame(animate);
-  }
-
-  // Toggle Methods
-  toggleSwitch(key: 'toggle1' | 'toggle2' | 'toggle3'): void {
-    this.toggleStates[key] = !this.toggleStates[key];
-  }
-
-  // GitHub Contributions (Generate Demo Data)
-  generateGithubContributions(): void {
-    this.githubContributions = [];
-    for (let week = 0; week < 12; week++) {
-      const weekData: number[] = [];
-      for (let day = 0; day < 7; day++) {
-        // Random contribution level (0-4)
-        weekData.push(Math.floor(Math.random() * 5));
-      }
-      this.githubContributions.push(weekData);
-    }
-  }
-
-  getContributionColor(level: number): string {
-    const colors = ['#1a1a2e', '#0e4429', '#006d32', '#26a641', '#39d353'];
-    return colors[level] || colors[0];
-  }
-
-  // Theme Color Methods
-  setThemeColor(color: string): void {
-    this.selectedThemeColor = color;
-    document.documentElement.style.setProperty('--accent-color', color);
-    // Convert hex to RGB for use in rgba()
-    const rgb = this.hexToRgb(color);
-    if (rgb) {
-      document.documentElement.style.setProperty('--accent-color-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);
-    }
-  }
-
-  hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : null;
-  }
-
-  // Weather Icon
-  getWeatherIcon(): string {
-    const icons: { [key: string]: string } = {
-      'sunny': '☀️',
-      'partly-cloudy': '⛅',
-      'cloudy': '☁️',
-      'rainy': '🌧️',
-      'snowy': '❄️',
-      'stormy': '⛈️'
-    };
-    return icons[this.weather.icon] || '🌤️';
-  }
-
   // Initialize Cover Page Widgets
   initCoverPageWidgets(): void {
     // Start clock updates
@@ -270,13 +263,90 @@ export class AppComponent implements OnInit, OnDestroy {
     // Update progress bars
     this.updateProgress();
 
-    // Generate GitHub contributions
-    this.generateGithubContributions();
-
     // Start quote rotation
     this.quoteInterval = setInterval(() => {
       this.nextQuote();
     }, 8000);
+
+    // Fetch live weather + refresh every 10 minutes
+    this.fetchWeather();
+    this.weatherInterval = setInterval(() => this.fetchWeather(), 10 * 60 * 1000);
+  }
+
+  // Weather fetch — Open-Meteo (no API key required)
+  private weatherInterval: any = null;
+
+  async fetchWeather(): Promise<void> {
+    try {
+      const url =
+        'https://api.open-meteo.com/v1/forecast' +
+        '?latitude=43.0731&longitude=-89.4012' +
+        '&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,wind_direction_10m,surface_pressure,cloud_cover,weather_code' +
+        '&daily=sunrise,sunset' +
+        '&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago';
+
+      const res = await fetch(url);
+      if (!res.ok) return;
+      const data = await res.json();
+      const c = data.current;
+      const d = data.daily;
+      if (!c) return;
+
+      const formatTime = (iso: string) => {
+        if (!iso) return '';
+        const dt = new Date(iso);
+        return dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Chicago' });
+      };
+
+      this.weather = {
+        ...this.weather,
+        tempF: Math.round(c.temperature_2m),
+        feelsLikeF: Math.round(c.apparent_temperature),
+        humidity: Math.round(c.relative_humidity_2m),
+        windSpeed: Math.round(c.wind_speed_10m),
+        windDirection: this.degToCompass(c.wind_direction_10m),
+        pressure: Math.round(c.surface_pressure),
+        cloudCover: Math.round(c.cloud_cover),
+        condition: this.wmoCodeToCondition(c.weather_code),
+        icon: this.wmoCodeToIcon(c.weather_code),
+        sunrise: d?.sunrise?.[0] ? formatTime(d.sunrise[0]) : this.weather.sunrise,
+        sunset: d?.sunset?.[0] ? formatTime(d.sunset[0]) : this.weather.sunset
+      };
+    } catch {
+      // Silently keep prior data on failure
+    }
+  }
+
+  private wmoCodeToCondition(code: number): string {
+    if (code === 0) return 'Clear';
+    if (code === 1) return 'Mainly Clear';
+    if (code === 2) return 'Partly Cloudy';
+    if (code === 3) return 'Overcast';
+    if (code === 45 || code === 48) return 'Foggy';
+    if (code >= 51 && code <= 57) return 'Drizzle';
+    if (code >= 61 && code <= 67) return 'Rainy';
+    if (code >= 71 && code <= 77) return 'Snowy';
+    if (code >= 80 && code <= 82) return 'Rain Showers';
+    if (code >= 85 && code <= 86) return 'Snow Showers';
+    if (code >= 95) return 'Thunderstorm';
+    return 'Unknown';
+  }
+
+  private wmoCodeToIcon(code: number): string {
+    if (code === 0 || code === 1) return 'sunny';
+    if (code === 2) return 'partly-cloudy';
+    if (code === 3) return 'cloudy';
+    if (code === 45 || code === 48) return 'fog';
+    if (code >= 51 && code <= 67) return 'rain';
+    if (code >= 71 && code <= 86) return 'snow';
+    if (code >= 80 && code <= 82) return 'rain';
+    if (code >= 95) return 'storm';
+    return 'partly-cloudy';
+  }
+
+  private degToCompass(deg: number): string {
+    const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+    return dirs[Math.round((deg % 360) / 22.5) % 16];
   }
 
   // Cleanup Cover Page Widgets
@@ -286,6 +356,9 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     if (this.quoteInterval) {
       clearInterval(this.quoteInterval);
+    }
+    if (this.weatherInterval) {
+      clearInterval(this.weatherInterval);
     }
   }
 
@@ -472,6 +545,46 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   ];
 
+  // ==================== BLOG POSTS ====================
+  blogPosts = [
+    {
+      title: 'Why Current-Source Inverters Matter for Next-Gen EV Drives',
+      excerpt: 'Voltage-source inverters dominate today’s drives, but CSI architectures offer compelling advantages for SiC and GaN at high frequencies. Here’s why I think they deserve another look.',
+      date: '2025-03-14',
+      tags: ['CSI', 'EV', 'Power Electronics'],
+      readTime: '7 min read',
+      platform: 'Medium',
+      url: 'https://medium.com/@maheepbhatt'
+    },
+    {
+      title: 'Designing PCBs for High-Frequency SiC Inverters',
+      excerpt: 'Lessons from spinning multiple boards at WEMPEC — from layout choices that kill ringing to gate-drive layout patterns that survive 100 kHz switching.',
+      date: '2025-01-22',
+      tags: ['PCB', 'SiC', 'Hardware'],
+      readTime: '9 min read',
+      platform: 'Substack',
+      url: 'https://substack.com/'
+    },
+    {
+      title: 'From Simulation to Hardware: A WEMPEC Story',
+      excerpt: 'How I closed the loop from MATLAB/Simulink → PLECS → PSIM → a working bench prototype. What translated, what didn’t, and where I lost a week debugging.',
+      date: '2024-11-09',
+      tags: ['WEMPEC', 'Workflow', 'Simulation'],
+      readTime: '6 min read',
+      platform: 'Dev.to',
+      url: 'https://dev.to/'
+    },
+    {
+      title: 'What I Learned from My Ford Internship',
+      excerpt: 'A summer inside an OEM powertrain team — the gap between academia and industry, the gap between a paper claim and a vehicle requirement, and what I’d do differently.',
+      date: '2024-09-02',
+      tags: ['Industry', 'EV', 'Career'],
+      readTime: '5 min read',
+      platform: 'LinkedIn',
+      url: 'https://www.linkedin.com/in/maheep-bhatt'
+    }
+  ];
+
   currentYear = new Date().getFullYear();
 
   // Mobile menu state
@@ -512,6 +625,8 @@ export class AppComponent implements OnInit, OnDestroy {
   bomMessageType: 'error' | 'success' | '' = '';
   isCreatingCart = false;
   digiKeyCartUrl = '';
+  boardCount = 1;
+  sparePercent = 0;
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
@@ -651,7 +766,20 @@ export class AppComponent implements OnInit, OnDestroy {
     this.bomResults = Array.from(partQuantityMap.entries()).map(([pn, qty]) => ({
       partNumber: pn,
       digikeyUrl: `https://www.digikey.com/en/products/result?keywords=${encodeURIComponent(pn)}`,
-      quantity: qty
+      baseQuantity: qty,
+      quantity: this.getAdjustedQty(qty)
+    }));
+  }
+
+  getAdjustedQty(baseQty: number): number {
+    return Math.ceil(baseQty * this.boardCount * (1 + this.sparePercent / 100));
+  }
+
+  recalculateQuantities(): void {
+    this.digiKeyCartUrl = '';
+    this.bomResults = this.bomResults.map(r => ({
+      ...r,
+      quantity: this.getAdjustedQty(r.baseQuantity)
     }));
   }
 
@@ -667,418 +795,429 @@ export class AppComponent implements OnInit, OnDestroy {
     });
   }
 
-  async createDigiKeyCart(): Promise<void> {
+  createDigiKeyCart(): void {
     if (this.bomResults.length === 0 || !this.selectedQuantityColumn) {
       return;
     }
 
-    this.isCreatingCart = true;
-    this.digiKeyCartUrl = '';
-    this.bomMessage = '';
-    this.bomMessageType = '';
+    // DigiKey FastAdd: POST to fastadd.aspx with part1/qty1, part2/qty2, ...
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'https://www.digikey.com/classic/ordering/fastadd.aspx';
+    form.target = '_blank';
+    form.style.display = 'none';
 
-    try {
-      // Generate CSV content for DigiKey BOM Manager
-      // This allows users to select packaging (Cut Tape vs Tape & Reel)
-      const csvLines = ['Quantity,Part Number'];
-      this.bomResults.forEach(item => {
-        csvLines.push(`${item.quantity},"${item.partNumber}"`);
-      });
-      const csvContent = csvLines.join('\n');
+    // Start a new cart
+    const newCartField = document.createElement('input');
+    newCartField.type  = 'hidden';
+    newCartField.name  = 'newcart';
+    newCartField.value = 'true';
+    form.appendChild(newCartField);
 
-      // Create downloadable CSV file
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
+    // Add each part as numbered field pairs: part1/qty1, part2/qty2, ...
+    this.bomResults.forEach((item, i) => {
+      const n = i + 1;
 
-      // Trigger download
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'digikey_bom.csv';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      const partField = document.createElement('input');
+      partField.type  = 'hidden';
+      partField.name  = `part${n}`;
+      partField.value = item.partNumber;
+      form.appendChild(partField);
 
-      // Set URL to DigiKey BOM Manager
-      this.digiKeyCartUrl = 'https://www.digikey.com/BOM';
-      this.bomMessage = 'CSV downloaded! Click below to open DigiKey BOM Manager, then upload the CSV file. You can select Cut Tape (CT) packaging for each part.';
-      this.bomMessageType = 'success';
-    } catch (error) {
-      console.error('Error creating DigiKey cart:', error);
-      this.bomMessage = `Failed to create DigiKey link: ${error instanceof Error ? error.message : 'Unknown error'}`;
-      this.bomMessageType = 'error';
-    } finally {
-      this.isCreatingCart = false;
-    }
-  }
-
-  // LaTeX Tool properties
-  latexActiveTab: 'word-to-latex' | 'latex-to-word' = 'word-to-latex';
-  isLatexDragOver = false;
-  latexOutput = '';
-  latexInput = '';
-  latexMessage = '';
-  latexMessageType: 'error' | 'success' | '' = '';
-  currentFileName = 'document';
-
-  onLatexDragOver(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isLatexDragOver = true;
-  }
-
-  onLatexDragLeave(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isLatexDragOver = false;
-  }
-
-  onLatexDrop(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isLatexDragOver = false;
-
-    const files = event.dataTransfer?.files;
-    if (files && files.length > 0) {
-      this.processWordFile(files[0]);
-    }
-  }
-
-  onWordFileSelect(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.processWordFile(input.files[0]);
-    }
-  }
-
-  async processWordFile(file: File): Promise<void> {
-    this.latexMessage = '';
-    this.latexMessageType = '';
-    this.latexOutput = '';
-
-    if (!file.name.endsWith('.docx')) {
-      this.latexMessage = 'Please upload a .docx file';
-      this.latexMessageType = 'error';
-      return;
-    }
-
-    this.currentFileName = file.name.replace('.docx', '');
-
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-      const result = await mammoth.convertToHtml({ arrayBuffer });
-      const html = result.value;
-
-      // Convert HTML to LaTeX
-      this.latexOutput = this.htmlToLatex(html);
-      this.latexMessage = 'Conversion successful!';
-      this.latexMessageType = 'success';
-    } catch (error) {
-      this.latexMessage = 'Error processing Word file. Please try again.';
-      this.latexMessageType = 'error';
-    }
-  }
-
-  htmlToLatex(html: string): string {
-    let latex = html;
-
-    // First, decode HTML entities
-    latex = latex.replace(/&nbsp;/g, ' ');
-    latex = latex.replace(/&amp;/g, '&');
-    latex = latex.replace(/&lt;/g, '<');
-    latex = latex.replace(/&gt;/g, '>');
-    latex = latex.replace(/&quot;/g, '"');
-    latex = latex.replace(/&#39;/g, "'");
-
-    // Extract text content and escape special LaTeX characters FIRST
-    // We need to do this carefully to not break HTML tags
-    const escapeLatexChars = (text: string): string => {
-      return text
-        .replace(/\\/g, '\\textbackslash{}')
-        .replace(/([&%$#_{}])/g, '\\$1')
-        .replace(/\^/g, '\\textasciicircum{}')
-        .replace(/~/g, '\\textasciitilde{}');
-    };
-
-    // Process text between tags - escape special chars in content only
-    latex = latex.replace(/>([^<]+)</g, (match, content) => {
-      return '>' + escapeLatexChars(content) + '<';
+      const qtyField  = document.createElement('input');
+      qtyField.type   = 'hidden';
+      qtyField.name   = `qty${n}`;
+      qtyField.value  = String(item.quantity);
+      form.appendChild(qtyField);
     });
 
-    // Convert headings
-    latex = latex.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '\\section{$1}\n');
-    latex = latex.replace(/<h2[^>]*>(.*?)<\/h2>/gi, '\\subsection{$1}\n');
-    latex = latex.replace(/<h3[^>]*>(.*?)<\/h3>/gi, '\\subsubsection{$1}\n');
-    latex = latex.replace(/<h4[^>]*>(.*?)<\/h4>/gi, '\\paragraph{$1}\n');
-    latex = latex.replace(/<h5[^>]*>(.*?)<\/h5>/gi, '\\subparagraph{$1}\n');
-    latex = latex.replace(/<h6[^>]*>(.*?)<\/h6>/gi, '\\subparagraph{$1}\n');
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
 
-    // Convert text formatting
-    latex = latex.replace(/<strong>(.*?)<\/strong>/gi, '\\textbf{$1}');
-    latex = latex.replace(/<b>(.*?)<\/b>/gi, '\\textbf{$1}');
-    latex = latex.replace(/<em>(.*?)<\/em>/gi, '\\textit{$1}');
-    latex = latex.replace(/<i>(.*?)<\/i>/gi, '\\textit{$1}');
-    latex = latex.replace(/<u>(.*?)<\/u>/gi, '\\underline{$1}');
-    latex = latex.replace(/<sup>(.*?)<\/sup>/gi, '\\textsuperscript{$1}');
-    latex = latex.replace(/<sub>(.*?)<\/sub>/gi, '\\textsubscript{$1}');
+    this.digiKeyCartUrl = 'https://www.digikey.com/ordering/shoppingcart';
+    this.bomMessage = `${this.bomResults.length} components sent to DigiKey cart.`;
+    this.bomMessageType = 'success';
+  }
 
-    // Convert lists
-    latex = latex.replace(/<ul[^>]*>/gi, '\\begin{itemize}\n');
-    latex = latex.replace(/<\/ul>/gi, '\\end{itemize}\n');
-    latex = latex.replace(/<ol[^>]*>/gi, '\\begin{enumerate}\n');
-    latex = latex.replace(/<\/ol>/gi, '\\end{enumerate}\n');
-    latex = latex.replace(/<li[^>]*>(.*?)<\/li>/gi, '  \\item $1\n');
-
-    // Convert paragraphs
-    latex = latex.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n\n');
-
-    // Convert line breaks
-    latex = latex.replace(/<br\s*\/?>/gi, '\\\\\n');
-
-    // Convert links - need to unescape the URL
-    latex = latex.replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, (match, url, text) => {
-      // Unescape URL (it may have been escaped)
-      const cleanUrl = url.replace(/\\([&%$#_{}])/g, '$1');
-      return `\\href{${cleanUrl}}{${text}}`;
+  exportBomCsv(): void {
+    const csvLines = ['Quantity,Part Number'];
+    this.bomResults.forEach(item => {
+      csvLines.push(`${item.quantity},"${item.partNumber}"`);
     });
-
-    // Remove remaining HTML tags
-    latex = latex.replace(/<[^>]+>/g, '');
-
-    // Clean up extra whitespace
-    latex = latex.replace(/\n{3,}/g, '\n\n');
-    latex = latex.trim();
-
-    // Escape title for LaTeX
-    const safeTitle = this.currentFileName
-      .replace(/\\/g, '\\textbackslash{}')
-      .replace(/([&%$#_{}])/g, '\\$1')
-      .replace(/\^/g, '\\textasciicircum{}')
-      .replace(/~/g, '\\textasciitilde{}');
-
-    // Document structure
-    const preamble = `\\documentclass{article}
-\\usepackage[utf8]{inputenc}
-\\usepackage[T1]{fontenc}
-\\usepackage{amsmath}
-\\usepackage{amssymb}
-\\usepackage{graphicx}
-\\usepackage{hyperref}
-\\usepackage{textcomp}
-
-\\title{${safeTitle}}
-\\date{}
-
-\\begin{document}
-
-\\maketitle
-
-`;
-
-    return preamble + latex + '\n\n\\end{document}';
-  }
-
-  copyLatexOutput(): void {
-    navigator.clipboard.writeText(this.latexOutput).then(() => {
-      this.latexMessage = 'LaTeX code copied to clipboard!';
-      this.latexMessageType = 'success';
-      setTimeout(() => {
-        this.latexMessage = '';
-        this.latexMessageType = '';
-      }, 3000);
-    });
-  }
-
-  downloadLatexFile(): void {
-    const blob = new Blob([this.latexOutput], { type: 'text/plain;charset=utf-8' });
-    saveAs(blob, `${this.currentFileName}.tex`);
-    this.latexMessage = 'LaTeX file downloaded!';
-    this.latexMessageType = 'success';
-  }
-
-  async convertLatexToWord(): Promise<void> {
-    if (!this.latexInput.trim()) {
-      this.latexMessage = 'Please enter some LaTeX code';
-      this.latexMessageType = 'error';
-      return;
-    }
-
-    try {
-      const paragraphs = this.parseLatexToDocx(this.latexInput);
-
-      const doc = new Document({
-        sections: [{
-          properties: {},
-          children: paragraphs
-        }]
-      });
-
-      const blob = await Packer.toBlob(doc);
-      saveAs(blob, 'converted-document.docx');
-
-      this.latexMessage = 'Word document downloaded!';
-      this.latexMessageType = 'success';
-    } catch (error) {
-      this.latexMessage = 'Error converting LaTeX. Please check your syntax.';
-      this.latexMessageType = 'error';
-    }
-  }
-
-  parseLatexToDocx(latex: string): Paragraph[] {
-    const paragraphs: Paragraph[] = [];
-
-    // Remove preamble
-    let content = latex;
-    const beginDoc = content.indexOf('\\begin{document}');
-    const endDoc = content.indexOf('\\end{document}');
-    if (beginDoc !== -1) {
-      content = content.substring(beginDoc + 16);
-    }
-    if (endDoc !== -1) {
-      content = content.substring(0, content.indexOf('\\end{document}'));
-    }
-
-    // Split by sections and paragraphs
-    const lines = content.split('\n');
-    let currentText = '';
-
-    for (const line of lines) {
-      const trimmedLine = line.trim();
-
-      // Handle sections
-      const sectionMatch = trimmedLine.match(/\\section\{([^}]+)\}/);
-      if (sectionMatch) {
-        if (currentText.trim()) {
-          paragraphs.push(new Paragraph({ children: this.parseLatexText(currentText) }));
-          currentText = '';
-        }
-        paragraphs.push(new Paragraph({
-          text: sectionMatch[1],
-          heading: HeadingLevel.HEADING_1
-        }));
-        continue;
-      }
-
-      const subsectionMatch = trimmedLine.match(/\\subsection\{([^}]+)\}/);
-      if (subsectionMatch) {
-        if (currentText.trim()) {
-          paragraphs.push(new Paragraph({ children: this.parseLatexText(currentText) }));
-          currentText = '';
-        }
-        paragraphs.push(new Paragraph({
-          text: subsectionMatch[1],
-          heading: HeadingLevel.HEADING_2
-        }));
-        continue;
-      }
-
-      const subsubsectionMatch = trimmedLine.match(/\\subsubsection\{([^}]+)\}/);
-      if (subsubsectionMatch) {
-        if (currentText.trim()) {
-          paragraphs.push(new Paragraph({ children: this.parseLatexText(currentText) }));
-          currentText = '';
-        }
-        paragraphs.push(new Paragraph({
-          text: subsubsectionMatch[1],
-          heading: HeadingLevel.HEADING_3
-        }));
-        continue;
-      }
-
-      // Handle itemize/enumerate
-      const itemMatch = trimmedLine.match(/\\item\s*(.*)/);
-      if (itemMatch) {
-        if (currentText.trim()) {
-          paragraphs.push(new Paragraph({ children: this.parseLatexText(currentText) }));
-          currentText = '';
-        }
-        paragraphs.push(new Paragraph({
-          children: this.parseLatexText(itemMatch[1]),
-          bullet: { level: 0 }
-        }));
-        continue;
-      }
-
-      // Skip environment markers
-      if (trimmedLine.match(/\\begin\{|\\end\{|\\documentclass|\\usepackage/)) {
-        continue;
-      }
-
-      // Empty line = new paragraph
-      if (trimmedLine === '' && currentText.trim()) {
-        paragraphs.push(new Paragraph({ children: this.parseLatexText(currentText) }));
-        currentText = '';
-        continue;
-      }
-
-      currentText += ' ' + trimmedLine;
-    }
-
-    // Add remaining text
-    if (currentText.trim()) {
-      paragraphs.push(new Paragraph({ children: this.parseLatexText(currentText) }));
-    }
-
-    return paragraphs;
-  }
-
-  parseLatexText(text: string): TextRun[] {
-    const runs: TextRun[] = [];
-    let remaining = text.trim();
-
-    // Simple regex-based parsing for bold, italic, underline
-    const pattern = /\\textbf\{([^}]+)\}|\\textit\{([^}]+)\}|\\underline\{([^}]+)\}|\\emph\{([^}]+)\}|([^\\]+)/g;
-    let match;
-
-    while ((match = pattern.exec(remaining)) !== null) {
-      if (match[1]) {
-        // Bold
-        runs.push(new TextRun({ text: match[1], bold: true }));
-      } else if (match[2]) {
-        // Italic
-        runs.push(new TextRun({ text: match[2], italics: true }));
-      } else if (match[3]) {
-        // Underline
-        runs.push(new TextRun({ text: match[3], underline: {} }));
-      } else if (match[4]) {
-        // Emph (italic)
-        runs.push(new TextRun({ text: match[4], italics: true }));
-      } else if (match[5]) {
-        // Regular text - clean up any remaining LaTeX commands
-        let cleanText = match[5]
-          .replace(/\\[a-zA-Z]+\{[^}]*\}/g, '')
-          .replace(/\\\\/g, '\n')
-          .replace(/\\&/g, '&')
-          .replace(/\\%/g, '%')
-          .replace(/\\#/g, '#')
-          .replace(/\\\$/g, '$')
-          .trim();
-        if (cleanText) {
-          runs.push(new TextRun({ text: cleanText }));
-        }
-      }
-    }
-
-    if (runs.length === 0) {
-      runs.push(new TextRun({ text: text.trim() }));
-    }
-
-    return runs;
+    const blob = new Blob([csvLines.join('\n')], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'digikey_bom.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 
   // Design Tools dropdown
-  selectedDesignTool: string = 'bom-tool';
+  selectedDesignTool: string = 'csi-tool';
   designTools = [
+    { id: 'csi-tool', name: 'CSI Design Tool', icon: 'inverter' },
     { id: 'bom-tool', name: 'BOM to DigiKey', icon: 'cart' },
-    { id: 'latex-tool', name: 'Word & LaTeX Converter', icon: 'document' },
     { id: 'inverter-demo', name: 'VSI vs CSI Demo', icon: 'inverter' },
     { id: 'magnetics-tool', name: 'Magnetics Design', icon: 'inductor' },
     { id: 'heatsink-tool', name: 'Heatsink Calculator', icon: 'thermal' },
-    { id: 'snubber-tool', name: 'Snubber Design', icon: 'circuit' }
+    { id: 'snubber-tool', name: 'Snubber Design', icon: 'circuit' },
+    { id: 'eqn-studio', name: 'Equation Studio', icon: 'formula' }
   ];
 
   selectDesignTool(toolId: string): void {
     this.selectedDesignTool = toolId;
+    if (toolId === 'eqn-studio') {
+      // The <math-field> mounts on this tick; render once it exists.
+      setTimeout(() => { this.configureMathLive(); this.renderEqnPreview(); }, 50);
+    }
+  }
+
+  // ==================== EQUATION STUDIO TOOL ====================
+  // Visual MathLive editor (no LaTeX needed) -> MathJax SVG/PNG export for Inkscape.
+  @ViewChild('mathField') mathFieldRef?: ElementRef<any>;
+
+  eqnColor = '#111111';
+  eqnFont = 'normal';     // MathLive math variant: normal | sans-serif | monospace | script | double-struck | fraktur
+  eqnSize = 4;            // MathLive fontSize 1..10 (per-selection emphasis)
+  eqnOutputSize = 24;     // overall font size in POINTS (pt), Word-style (drives SVG/PNG output size)
+  eqnPngScale = 1;        // extra PNG supersampling on top of the already-high render density
+  eqnTransparentBg = true;
+  eqnSvgMarkup = '';
+  eqnSafePreview: SafeHtml = '';
+  eqnPxW = 0;             // intrinsic px width/height of the last rendered SVG (for crisp PNG export)
+  eqnPxH = 0;
+  eqnMessage = '';
+  eqnMessageType: 'error' | 'success' | '' = '';
+
+  // Quick-insert palette, grouped by category. label = button glyph, latex = inserted snippet
+  // (#0/#1/… become edit slots in the MathLive field).
+  eqnPalette: { name: string; items: { label: string; latex: string }[] }[] = [
+    {
+      name: 'Structure',
+      items: [
+        { label: 'a⁄b', latex: '\\frac{#0}{#1}' },
+        { label: '√', latex: '\\sqrt{#0}' },
+        { label: 'ⁿ√', latex: '\\sqrt[#0]{#1}' },
+        { label: 'xⁿ', latex: '#0^{#1}' },
+        { label: 'xₙ', latex: '#0_{#1}' },
+        { label: '( )', latex: '\\left( #0 \\right)' },
+        { label: '|x|', latex: '\\left| #0 \\right|' },
+        { label: '[ ]', latex: '\\begin{bmatrix} #0 & #1 \\\\ #2 & #3 \\end{bmatrix}' }
+      ]
+    },
+    {
+      name: 'Operators',
+      items: [
+        { label: '±', latex: '\\pm' },
+        { label: '∓', latex: '\\mp' },
+        { label: '×', latex: '\\times' },
+        { label: '÷', latex: '\\div' },
+        { label: '·', latex: '\\cdot' },
+        { label: '∂', latex: '\\partial' },
+        { label: '∇', latex: '\\nabla' },
+        { label: '∫', latex: '\\int_{#0}^{#1}' },
+        { label: '∮', latex: '\\oint' },
+        { label: '∑', latex: '\\sum_{#0}^{#1}' },
+        { label: '∏', latex: '\\prod_{#0}^{#1}' },
+        { label: '∞', latex: '\\infty' }
+      ]
+    },
+    {
+      name: 'Relations',
+      items: [
+        { label: '≠', latex: '\\neq' },
+        { label: '≈', latex: '\\approx' },
+        { label: '≤', latex: '\\leq' },
+        { label: '≥', latex: '\\geq' },
+        { label: '≪', latex: '\\ll' },
+        { label: '≫', latex: '\\gg' },
+        { label: '∝', latex: '\\propto' },
+        { label: '≡', latex: '\\equiv' },
+        { label: '∼', latex: '\\sim' },
+        { label: '∠', latex: '\\angle' },
+        { label: '→', latex: '\\to' },
+        { label: '⇒', latex: '\\Rightarrow' },
+        { label: '↔', latex: '\\leftrightarrow' }
+      ]
+    },
+    {
+      name: 'Greek',
+      items: [
+        { label: 'α', latex: '\\alpha' }, { label: 'β', latex: '\\beta' },
+        { label: 'γ', latex: '\\gamma' }, { label: 'δ', latex: '\\delta' },
+        { label: 'ε', latex: '\\epsilon' }, { label: 'ζ', latex: '\\zeta' },
+        { label: 'η', latex: '\\eta' }, { label: 'θ', latex: '\\theta' },
+        { label: 'κ', latex: '\\kappa' }, { label: 'λ', latex: '\\lambda' },
+        { label: 'μ', latex: '\\mu' }, { label: 'ν', latex: '\\nu' },
+        { label: 'ξ', latex: '\\xi' }, { label: 'π', latex: '\\pi' },
+        { label: 'ρ', latex: '\\rho' }, { label: 'σ', latex: '\\sigma' },
+        { label: 'τ', latex: '\\tau' }, { label: 'φ', latex: '\\phi' },
+        { label: 'χ', latex: '\\chi' }, { label: 'ψ', latex: '\\psi' },
+        { label: 'ω', latex: '\\omega' },
+        { label: 'Γ', latex: '\\Gamma' }, { label: 'Δ', latex: '\\Delta' },
+        { label: 'Θ', latex: '\\Theta' }, { label: 'Λ', latex: '\\Lambda' },
+        { label: 'Ξ', latex: '\\Xi' }, { label: 'Π', latex: '\\Pi' },
+        { label: 'Σ', latex: '\\Sigma' }, { label: 'Φ', latex: '\\Phi' },
+        { label: 'Ψ', latex: '\\Psi' }, { label: 'Ω', latex: '\\Omega' }
+      ]
+    },
+    {
+      name: 'Units',
+      items: [
+        { label: 'Ω', latex: '\\Omega' },
+        { label: 'µ', latex: '\\mu' },
+        { label: '°', latex: '^{\\circ}' },
+        { label: '°C', latex: '\\,^{\\circ}\\mathrm{C}' },
+        { label: '°F', latex: '\\,^{\\circ}\\mathrm{F}' },
+        { label: '℧', latex: '\\mho' },
+        { label: '·', latex: '\\cdot' },
+        { label: 'mV', latex: '\\,\\mathrm{mV}' },
+        { label: 'mA', latex: '\\,\\mathrm{mA}' },
+        { label: 'kΩ', latex: '\\,\\mathrm{k\\Omega}' },
+        { label: 'MΩ', latex: '\\,\\mathrm{M\\Omega}' },
+        { label: 'µF', latex: '\\,\\mathrm{\\mu F}' },
+        { label: 'nF', latex: '\\,\\mathrm{nF}' },
+        { label: 'µH', latex: '\\,\\mathrm{\\mu H}' },
+        { label: 'mH', latex: '\\,\\mathrm{mH}' },
+        { label: 'kHz', latex: '\\,\\mathrm{kHz}' },
+        { label: 'MHz', latex: '\\,\\mathrm{MHz}' },
+        { label: 'kW', latex: '\\,\\mathrm{kW}' }
+      ]
+    },
+    {
+      name: 'Sets',
+      items: [
+        { label: '∈', latex: '\\in' },
+        { label: '∉', latex: '\\notin' },
+        { label: '⊂', latex: '\\subset' },
+        { label: '⊆', latex: '\\subseteq' },
+        { label: '⊃', latex: '\\supset' },
+        { label: '∪', latex: '\\cup' },
+        { label: '∩', latex: '\\cap' },
+        { label: '∅', latex: '\\emptyset' },
+        { label: '∀', latex: '\\forall' },
+        { label: '∃', latex: '\\exists' },
+        { label: 'ℝ', latex: '\\mathbb{R}' },
+        { label: 'ℂ', latex: '\\mathbb{C}' },
+        { label: 'ℤ', latex: '\\mathbb{Z}' },
+        { label: 'ℕ', latex: '\\mathbb{N}' },
+        { label: 'ℚ', latex: '\\mathbb{Q}' }
+      ]
+    },
+    {
+      name: 'Accents',
+      items: [
+        { label: 'ẋ', latex: '\\dot{#0}' },
+        { label: 'ẍ', latex: '\\ddot{#0}' },
+        { label: 'x̂', latex: '\\hat{#0}' },
+        { label: 'x̄', latex: '\\bar{#0}' },
+        { label: 'x⃗', latex: '\\vec{#0}' },
+        { label: 'x̃', latex: '\\tilde{#0}' },
+        { label: 'ẋ̇', latex: '\\dddot{#0}' },
+        { label: 'x′', latex: '#0^{\\prime}' }
+      ]
+    }
+  ];
+
+  private get mathField(): any | null {
+    return this.mathFieldRef?.nativeElement ?? null;
+  }
+
+  // --- Formatting toolbar (drives MathLive applyStyle / insertions) ---
+  // Math mode uses variantStyle/variant (not fontSeries/fontShape, which are text-mode only).
+  eqnBold(): void { this.mathField?.applyStyle({ variantStyle: 'bold' }); this.afterEqnEdit(); }
+  eqnItalic(): void { this.mathField?.applyStyle({ variantStyle: 'italic' }); this.afterEqnEdit(); }
+  eqnUnderline(): void { this.mathField?.executeCommand(['insert', '\\underline{#0}']); this.afterEqnEdit(); }
+  eqnSetFont(v: string): void { this.eqnFont = v; this.mathField?.applyStyle({ variant: v }); this.afterEqnEdit(); }
+  eqnSetSize(n: number): void { this.eqnSize = +n; this.mathField?.applyStyle({ fontSize: +n }); this.afterEqnEdit(); }
+  eqnSetColor(hex: string): void { this.eqnColor = hex; this.mathField?.applyStyle({ color: hex }); this.afterEqnEdit(); }
+  eqnInsert(latex: string): void { this.mathField?.executeCommand(['insert', latex]); this.afterEqnEdit(); }
+  eqnClear(): void { if (this.mathField) { this.mathField.value = ''; } this.renderEqnPreview(); }
+
+  private afterEqnEdit(): void {
+    this.mathField?.focus?.();
+    this.renderEqnPreview();
+  }
+
+  // Render the current equation to a vector SVG via MathJax (the export preview = exactly what gets copied).
+  renderEqnPreview(): void {
+    if (typeof MathJax === 'undefined' || !MathJax?.tex2svg) {
+      this.setEqnMessage('Renderer still loading… try again in a moment.', 'error');
+      return;
+    }
+    const raw = (this.mathField?.value ?? '').trim();
+    if (!raw) {
+      this.eqnSvgMarkup = '';
+      this.eqnSafePreview = '';
+      this.eqnMessage = '';
+      this.eqnMessageType = '';
+      return;
+    }
+    try {
+      const latex = this.normalizeLatex(raw);
+      const node = MathJax.tex2svg(latex, { display: true });
+      const svg: SVGElement | null = node.querySelector('svg');
+      if (!svg) { this.setEqnMessage('Could not render this equation.', 'error'); return; }
+      if (svg.querySelector('[data-mjx-error], merror, .mjx-error')) {
+        this.setEqnMessage('Check the equation — part of it is not valid.', 'error');
+      } else if (this.eqnMessageType === 'error') {
+        this.eqnMessage = '';
+        this.eqnMessageType = '';
+      }
+      this.sizeSvg(svg);
+      this.eqnSvgMarkup = svg.outerHTML;
+      this.eqnSafePreview = this.sanitizer.bypassSecurityTrustHtml(this.eqnSvgMarkup);
+    } catch {
+      this.setEqnMessage('Could not render this equation.', 'error');
+    }
+  }
+
+  // Chosen font size converted points -> pixels (1pt = 96/72 px at 96 dpi, like Word).
+  private get eqnOutputPx(): number { return (this.eqnOutputSize || 24) * 4 / 3; }
+
+  // Resize MathJax's SVG to the chosen point size AND bake that scale into the geometry, expressing
+  // the viewBox in pixels. MathJax emits a fixed viewBox in its own internal units, which apps like
+  // Inkscape read as the object's true size — so just changing width/height is ignored and the
+  // equation always imports at the same big size. Rewriting the viewBox to pixels fixes that.
+  private sizeSvg(svg: SVGElement): void {
+    const k = this.eqnOutputPx * 0.5;   // px per ex (1ex ≈ 0.5 × font size)
+    const wEx = parseFloat(svg.getAttribute('width') || '0');
+    const hEx = parseFloat(svg.getAttribute('height') || '0');
+    const vb = (svg.getAttribute('viewBox') || '').split(/[\s,]+/).map(parseFloat);
+    if (!(wEx > 0 && hEx > 0) || vb.length !== 4 || !(vb[2] > 0)) {
+      this.eqnPxW = 0;
+      this.eqnPxH = 0;
+      return;
+    }
+    const pxW = Math.max(1, Math.round(wEx * k));
+    const pxH = Math.max(1, Math.round(hEx * k));
+    this.eqnPxW = pxW;
+    this.eqnPxH = pxH;
+
+    // Wrap MathJax's content in a group that maps its internal units onto the pixel viewBox.
+    const [vx, vy, vw] = vb;
+    const s = pxW / vw;
+    const ns = 'http://www.w3.org/2000/svg';
+    const g = document.createElementNS(ns, 'g');
+    g.setAttribute('transform', `translate(${(-s * vx).toFixed(4)} ${(-s * vy).toFixed(4)}) scale(${s.toFixed(6)})`);
+    while (svg.firstChild) { g.appendChild(svg.firstChild); }
+    svg.appendChild(g);
+
+    svg.setAttribute('viewBox', `0 0 ${pxW} ${pxH}`);
+    svg.setAttribute('width', String(pxW));
+    svg.setAttribute('height', String(pxH));
+    svg.style.removeProperty('vertical-align');
+    // MathJax glyphs use fill="currentColor"; pin it so the export is self-contained (and the preview
+    // doesn't inherit the dark theme's light text color). Per-selection \textcolor still overrides this.
+    svg.style.color = this.eqnColor;
+  }
+
+  eqnSetOutputSize(px: number): void { this.eqnOutputSize = +px; this.renderEqnPreview(); }
+
+  // Strip MathLive-only artifacts so MathJax parses the LaTeX cleanly. MathLive's style macros
+  // (\mathbf, \mathsf, \mathtt, \mathbb, \mathscr, \mathfrak, \textcolor, \underline) are all natively
+  // supported by MathJax (color via the loaded [tex]/color package).
+  private normalizeLatex(s: string): string {
+    return s
+      .replace(/\\placeholder\[[^\]]*\]\{\}/g, '')
+      .replace(/\\placeholder\{\}/g, '');
+  }
+
+  private setEqnMessage(msg: string, type: 'error' | 'success'): void {
+    this.eqnMessage = msg;
+    this.eqnMessageType = type;
+    if (type === 'success') {
+      setTimeout(() => { this.eqnMessage = ''; this.eqnMessageType = ''; }, 3000);
+    }
+  }
+
+  // --- Export ---
+  copyEqnSvg(): void {
+    if (!this.eqnSvgMarkup) { this.setEqnMessage('Nothing to copy yet.', 'error'); return; }
+    navigator.clipboard.writeText(this.eqnSvgMarkup)
+      .then(() => this.setEqnMessage('SVG copied — paste into Inkscape (Edit → Paste).', 'success'))
+      .catch(() => this.setEqnMessage('Clipboard blocked by the browser.', 'error'));
+  }
+
+  downloadEqnSvg(): void {
+    if (!this.eqnSvgMarkup) { this.setEqnMessage('Nothing to download yet.', 'error'); return; }
+    const xml = '<?xml version="1.0" encoding="UTF-8"?>\n' + this.eqnSvgMarkup;
+    saveAs(new Blob([xml], { type: 'image/svg+xml;charset=utf-8' }), 'equation.svg');
+    this.setEqnMessage('SVG downloaded.', 'success');
+  }
+
+  async copyEqnPng(): Promise<void> {
+    try {
+      const canvas = await this.svgToCanvas();
+      const blob = await new Promise<Blob | null>(res => canvas.toBlob(res, 'image/png'));
+      if (!blob) { this.setEqnMessage('Could not create PNG.', 'error'); return; }
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      this.setEqnMessage('PNG image copied to clipboard.', 'success');
+    } catch {
+      this.setEqnMessage('Could not copy PNG (browser may block image clipboard).', 'error');
+    }
+  }
+
+  async downloadEqnPng(): Promise<void> {
+    try {
+      const canvas = await this.svgToCanvas();
+      const blob = await new Promise<Blob | null>(res => canvas.toBlob(res, 'image/png'));
+      if (!blob) { this.setEqnMessage('Could not create PNG.', 'error'); return; }
+      saveAs(blob, 'equation.png');
+      this.setEqnMessage('PNG downloaded.', 'success');
+    } catch {
+      this.setEqnMessage('Could not create PNG.', 'error');
+    }
+  }
+
+  // Rasterize the current SVG to a high-resolution canvas. The SVG is resized to the FINAL target
+  // pixel dimensions before rasterizing so the vector is drawn crisply (no blurry upscaling).
+  // The PNG is rendered at a high internal density (independent of the on-screen "Equation size")
+  // so a copied/downloaded PNG looks as sharp as the vector SVG.
+  private svgToCanvas(): Promise<HTMLCanvasElement> {
+    return new Promise((resolve, reject) => {
+      if (!this.eqnSvgMarkup || this.eqnPxW < 1) { reject(new Error('no svg')); return; }
+      const RENDER_FONT_PX = 256;   // rasterize as if the equation were this size -> SVG-like crispness
+      const MAX_EDGE = 8192;        // keep within browser canvas limits
+      const quality = RENDER_FONT_PX / this.eqnOutputPx;
+      let scale = (this.eqnPngScale || 1) * quality;
+      const longest = Math.max(this.eqnPxW, this.eqnPxH) * scale;
+      if (longest > MAX_EDGE) scale *= MAX_EDGE / longest;   // clamp the largest edge
+      const targetW = Math.max(1, Math.round(this.eqnPxW * scale));
+      const targetH = Math.max(1, Math.round(this.eqnPxH * scale));
+
+      // Parse + resize the SVG root to the target resolution, then serialize.
+      let markup = this.eqnSvgMarkup;
+      try {
+        const doc = new DOMParser().parseFromString(this.eqnSvgMarkup, 'image/svg+xml');
+        const root = doc.documentElement;
+        root.setAttribute('width', String(targetW));
+        root.setAttribute('height', String(targetH));
+        markup = new XMLSerializer().serializeToString(root);
+      } catch { /* fall back to original markup */ }
+
+      const img = new Image();
+      const svg64 = btoa(unescape(encodeURIComponent(markup)));
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = targetW;
+        canvas.height = targetH;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { reject(new Error('no ctx')); return; }
+        if (!this.eqnTransparentBg) {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        ctx.drawImage(img, 0, 0, targetW, targetH);
+        resolve(canvas);
+      };
+      img.onerror = () => reject(new Error('img load failed'));
+      img.src = 'data:image/svg+xml;base64,' + svg64;
+    });
   }
 
   // Magnetics Design Tool properties
@@ -1297,12 +1436,18 @@ export class AppComponent implements OnInit, OnDestroy {
 
   // Snubber Design Calculator properties
   snubberInputs = {
-    voltage: 400,           // DC bus voltage
-    current: 10,            // Load current
-    deviceCoss: 100,        // Device output capacitance in pF
-    strayInductance: 50,    // Stray inductance in nH
-    switchingFreq: 50,      // Switching frequency in kHz
-    snubberType: 'rc'       // rc, rcd, or clamp
+    voltage: 400,            // switch-node voltage swing (V) — for power loss
+    current: 10,             // switch current (A) — for the peak-voltage estimate
+    switchingFreq: 50,       // switching frequency (kHz)
+    // --- TI seven-step RC method (measured on a scope) ---
+    ringFreqUnsnubbed: 19.2, // f0: ring frequency with NO snubber (MHz)
+    addedCap: 100,           // C1: capacitor added to shift the ring frequency (pF)
+    ringFreqShifted: 12.0,   // f1: ring frequency WITH C1 added (MHz)
+    // --- parasitic method (RCD / TVS clamp) ---
+    deviceCoss: 100,         // device output capacitance (pF)
+    strayInductance: 50,     // stray / leakage inductance (nH)
+    clampRipple: 80,         // RCD: allowable clamp overshoot dV above the rail (V)
+    snubberType: 'rc'        // rc (TI 7-step) | rcd | clamp
   };
 
   snubberResults: {
@@ -1315,95 +1460,80 @@ export class AppComponent implements OnInit, OnDestroy {
     snubberPowerLoss: number;
     dampingFactor: number;
     resonantFreq: number;
+    freqRatio: number;     // m = f0/f1 (TI step 3)
+    parasiticC: number;    // C0 in pF (TI step 4)
+    parasiticL: number;    // L in nH  (TI step 5)
     recommendation: string;
   } | null = null;
 
   calculateSnubber(): void {
     const V = this.snubberInputs.voltage;
     const I = this.snubberInputs.current;
-    const Coss = this.snubberInputs.deviceCoss * 1e-12; // Convert pF to F
-    const Ls = this.snubberInputs.strayInductance * 1e-9; // Convert nH to H
-    const fsw = this.snubberInputs.switchingFreq * 1000; // Convert to Hz
+    const fsw = this.snubberInputs.switchingFreq * 1000; // Hz
 
-    // Resonant frequency of parasitic LC
-    const f0 = 1 / (2 * Math.PI * Math.sqrt(Ls * Coss));
+    let Cs = 0, Rs = 0, Vpk_with = 0, Ploss = 0, zeta = 0;
+    let clampVoltage = 0, diode = 'N/A', recommendation = '';
+    let f0 = 0, Vpk_without = 0, parasiticC = 0, parasiticL = 0, m = 0;
 
-    // Peak voltage without snubber (LC ringing)
-    // Vpk = V + I * sqrt(Ls/Coss)
-    const Z0 = Math.sqrt(Ls / Coss);
-    const Vpk_without = V + I * Z0;
+    if (this.snubberInputs.snubberType === 'rc') {
+      // ===== TI "Power Tips: Calculate an R-C Snubber in Seven Steps" (SSZTBC7) =====
+      // Measurement-based: shift the ring frequency with a known cap, then back out the parasitics.
+      const f0r = this.snubberInputs.ringFreqUnsnubbed * 1e6;  // step 1: f0 (Hz), no snubber
+      const f1r = this.snubberInputs.ringFreqShifted * 1e6;    // step 2: f1 (Hz) with C1 added
+      const C1 = this.snubberInputs.addedCap * 1e-12;          // step 2: added capacitor (F)
+      m = f0r / f1r;                                           // step 3: m = f0 / f1
+      const C0 = C1 / (m * m - 1);                             // step 4: parasitic capacitance
+      const Lp = (m * m - 1) / (Math.pow(2 * Math.PI * f0r, 2) * C1); // step 5: parasitic inductance
+      Cs = 3 * C0;                                             // step 6: C_snub = 3·C0
+      Rs = Math.sqrt(Lp / C0);                                // step 7: R_snub = √(L / C0)
+      Ploss = Cs * V * V * fsw;                               // snubber loss ≈ C_snub·V²·f_sw
 
-    let Cs: number, Rs: number, Vpk_with: number, Ploss: number, zeta: number;
-    let clampVoltage = 0;
-    let diode = 'N/A';
-    let recommendation = '';
+      const Z0 = Math.sqrt(Lp / C0);
+      zeta = Rs / (2 * Math.sqrt(Lp / Cs));
+      Vpk_without = V + I * Z0;
+      Vpk_with = V + I * Z0 * Math.exp(-zeta * Math.PI);
+      f0 = f0r;
+      parasiticC = C0;
+      parasiticL = Lp;
+      recommendation = `TI 7-step → parasitics L₀≈${(Lp * 1e9).toFixed(0)} nH, C₀≈${(C0 * 1e12).toFixed(0)} pF. ` +
+        `Start with C_snub≈${(Cs * 1e12).toFixed(0)} pF and R_snub≈${Rs.toFixed(0)} Ω (rated ≥ ${Ploss.toFixed(2)} W). ` +
+        `Larger C_snub cuts the spike further but raises R loss.`;
+    } else {
+      // ===== Parasitic-LC method (RCD / TVS clamp) =====
+      const Coss = this.snubberInputs.deviceCoss * 1e-12;
+      const Ls = this.snubberInputs.strayInductance * 1e-9;
+      f0 = 1 / (2 * Math.PI * Math.sqrt(Ls * Coss));
+      const Z0 = Math.sqrt(Ls / Coss);
+      Vpk_without = V + I * Z0;
+      parasiticC = Coss;
+      parasiticL = Ls;
 
-    switch (this.snubberInputs.snubberType) {
-      case 'rc':
-        // RC Snubber design
-        // C_snubber typically 2-5x Coss
-        Cs = Coss * 3; // 3x Coss
-
-        // R for critical damping: R = sqrt(L/C) / 2
-        // But for overdamping to reduce ringing: R ≈ sqrt(L/C)
-        Rs = Z0;
-
-        // Damping factor
-        zeta = Rs / (2 * Math.sqrt(Ls / Cs));
-
-        // Peak voltage with snubber (reduced)
-        Vpk_with = V + I * Z0 * Math.exp(-zeta * Math.PI);
-
-        // Power loss in snubber: P = 0.5 * Cs * V² * fsw
-        Ploss = 0.5 * Cs * Math.pow(V, 2) * fsw;
-
-        recommendation = `RC snubber effective for moderate ringing. Resistor must handle ${(Ploss).toFixed(2)}W.`;
-        break;
-
-      case 'rcd':
-        // RCD Snubber design
-        // Capacitor sized to absorb turn-off energy
-        Cs = Coss * 5;
-
-        // R sets discharge time constant (should be < 1/fsw)
-        Rs = 1 / (10 * Cs * fsw);
-
-        zeta = 1; // RCD provides clamping, not damping
-
-        // Clamp voltage above DC bus
-        clampVoltage = V * 1.3; // Typical 30% overshoot allowance
+      if (this.snubberInputs.snubberType === 'rcd') {
+        // ===== Daycounter RCD clamping snubber =====
+        // Cap sized to absorb the leakage energy within an allowable overshoot dV above the rail.
+        const dV = this.snubberInputs.clampRipple;
+        Cs = (Ls * I * I) / (dV * (dV + 2 * V));   // C = L·I² / (dV·(dV + 2V))
+        Rs = 10 / (fsw * Cs);                       // R = 10 / (f·C)  (discharge time constant ≈ 10/f)
+        Ploss = 0.5 * Ls * I * I * fsw;             // P = ½·L·I²·f  (leakage energy per cycle)
+        zeta = 1;
+        clampVoltage = V + dV;                      // clamp cap settles to rail + overshoot
         Vpk_with = clampVoltage;
-
-        // Power loss
-        Ploss = 0.5 * Cs * Math.pow(clampVoltage - V, 2) * fsw + 0.5 * Ls * Math.pow(I, 2) * fsw;
-
-        diode = `Fast recovery, V_RRM > ${Math.ceil(clampVoltage * 1.5)}V, I_F > ${Math.ceil(I * 2)}A`;
-
-        recommendation = `RCD snubber provides voltage clamping. Use ultra-fast diode (trr < 50ns).`;
-        break;
-
-      case 'clamp':
-      default:
-        // Active clamp / TVS approach
-        clampVoltage = V * 1.2; // 20% above bus
-
-        Cs = 0; // No explicit capacitor needed
-        Rs = 0;
-
-        zeta = 1; // Hard clamp
+        diode = `Fast/ultrafast recovery, V_RRM > ${Math.ceil(clampVoltage * 1.5)}V, I_F > ${Math.ceil(I * 1.5)}A`;
+        recommendation = `Daycounter RCD clamp: C = L·I²/(dV(dV+2V)) ≈ ${(Cs * 1e9).toFixed(2)} nF, ` +
+          `R = 10/(f·C) ≈ ${Rs >= 1000 ? (Rs / 1000).toFixed(1) + ' kΩ' : Rs.toFixed(0) + ' Ω'}, ` +
+          `P = ½·L·I²·f ≈ ${Ploss.toFixed(2)} W. Clamps the leakage spike to ≈ ${(V + dV).toFixed(0)} V; use an ultrafast diode (trr < 50 ns).`;
+      } else {
+        clampVoltage = V * 1.2;
+        Cs = 0; Rs = 0; zeta = 1;
         Vpk_with = clampVoltage;
-
-        // TVS/Zener absorbs the energy
         Ploss = 0.5 * Ls * Math.pow(I, 2) * fsw;
-
         diode = `TVS: V_BR = ${Math.ceil(clampVoltage)}V, P_peak > ${Math.ceil(0.5 * Ls * I * I * 1e6)}mJ`;
-
         recommendation = `TVS clamp is most effective for hard clamping. Ensure TVS can handle peak energy.`;
-        break;
+      }
     }
 
     this.snubberResults = {
-      snubberC: Cs * 1e9, // Convert to nF
+      snubberC: Cs * 1e9, // nF
       snubberR: Rs,
       snubberD: diode,
       clampVoltage: clampVoltage,
@@ -1412,6 +1542,9 @@ export class AppComponent implements OnInit, OnDestroy {
       snubberPowerLoss: Ploss,
       dampingFactor: zeta,
       resonantFreq: f0 / 1e6, // MHz
+      freqRatio: m,
+      parasiticC: parasiticC * 1e12, // pF
+      parasiticL: parasiticL * 1e9,  // nH
       recommendation: recommendation
     };
   }
@@ -1495,19 +1628,19 @@ export class AppComponent implements OnInit, OnDestroy {
       return {
         type: 'IGBT + Diode',
         description: 'Best for low frequency (1-2 kHz). High current capability, lower switching losses at low frequencies.',
-        color: '#ff6b6b'
+        color: '#C4937A'
       };
     } else if (this.switchingFrequency <= 80) {
       return {
         type: 'SiC MOSFET',
         description: 'Optimal for medium-high frequency (2-80 kHz). Lower switching losses, higher efficiency than IGBT.',
-        color: '#00d4ff'
+        color: '#7EA8B8'
       };
     } else {
       return {
         type: 'GaN MOSFET',
         description: 'Best for high frequency (80-100 kHz). Fastest switching, lowest losses at high frequencies.',
-        color: '#00ff88'
+        color: '#9BB8A8'
       };
     }
   }
@@ -1713,9 +1846,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   getEfficiencyColor(): string {
     const eff = this.getEfficiency();
-    if (eff >= 95) return '#00ff88';
-    if (eff >= 90) return '#ffaa00';
-    return '#ff6b6b';
+    if (eff >= 95) return '#9BB8A8';
+    if (eff >= 90) return '#D4A574';
+    return '#C4937A';
   }
 
   getGaugeRotation(): number {
@@ -1792,10 +1925,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   getTempColor(lossWatts: number): string {
     // Temperature color based on absolute loss in Watts
-    if (lossWatts >= 500) return '#ff4444';
-    if (lossWatts >= 200) return '#ffaa00';
-    if (lossWatts >= 100) return '#ffcc00';
-    return '#00ff88';
+    if (lossWatts >= 500) return '#C4937A';
+    if (lossWatts >= 200) return '#D4A574';
+    if (lossWatts >= 100) return '#B8926A';
+    return '#9BB8A8';
   }
 
   getComponentTemp(lossWatts: number, thermalResistance: number = 0.5): number {
@@ -1846,6 +1979,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.cleanupCoverPageWidgets();
+    if (this.revealObserver) {
+      this.revealObserver.disconnect();
+      this.revealObserver = null;
+    }
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
     }
