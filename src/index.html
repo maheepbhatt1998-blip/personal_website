@@ -6,11 +6,23 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Maheep Bhatt - PhD Candidate in Electrical Engineering at UW-Madison, specializing in Power Electronics, GaN devices, and Electric Vehicle applications">
-  <meta name="theme-color" content="#0a0a0f">
+  <meta name="theme-color" content="#0D0D12">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;0,6..96,700;0,6..96,800;1,6..96,500&display=swap" rel="stylesheet">
+  <!-- MathLive: visual equation editor (registers the <math-field> custom element) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/mathlive"></script>
+  <!-- MathJax: renders LaTeX to vector SVG for export (Equation Studio tool) -->
+  <script>
+    window.MathJax = {
+      loader: { load: ['[tex]/color'] },          // enables hex colors (\textcolor{#ff0000}{...})
+      tex: { packages: { '[+]': ['color'] } },
+      svg: { fontCache: 'none' },   // inline glyph paths => standalone SVG pastes/opens cleanly in Inkscape
+      startup: { typeset: false }   // render on demand, not on page load
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script"></script>
 </head>
 <body>
   <app-root></app-root>
